@@ -1,0 +1,23 @@
+---
+id: "6355329948319744"
+headword: nəpαsitάpαtamən
+part_of_speech: TI
+sub_part_of_speech: class 1a
+english: I oversee it
+browse_letters: ['n']
+audio:
+  - type: main
+    file: audio/110241.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/110241.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/6355329948319744/
+---
+
+# nəpαsitάpαtamən
+
+**Part of speech:** TI · class 1a
+
+**English:** I oversee it
+
+## Audio
+
+- [Main pronunciation](../audio/110241.mp3)

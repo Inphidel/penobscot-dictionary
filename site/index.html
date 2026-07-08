@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  
+    <nav class="nav">
+      <a href="index.html" class="brand">Penobscot Dictionary</a>
+      <a href="index.html" class="active">Search</a>
+      <a href="browse.html" class="">Browse</a>
+      <a href="lab/index.html" class="">Lab</a>
+      <a href="about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <header class="hero">
+      <p class="badge-row"><span class="badge badge-archive">Penobscot Dictionary — official archive</span></p>
+      <h1>Penobscot Dictionary</h1>
+      <p class="subtitle">Local archive for language learning — 10,113 words, 9,354 with audio</p>
+    </header>
+    <section class="search-section">
+      <label for="q" class="sr-only">Search dictionary</label>
+      <input type="search" id="q" placeholder="Search Penobscot or English..." autocomplete="off" autofocus>
+      <div class="search-toolbar">
+        <p class="search-hint">Search headwords, definitions, and examples. Type a piece of a Penobscot word (e.g. <em>lihoso</em>) for partial matches below. Tap &#9654; to hear — tap again instantly to repeat.</p>
+        <div class="search-toolbar-actions">
+          <label class="loop-global" title="When on, audio repeats until you stop it">
+            <input type="checkbox" id="loop-global"> Loop while studying
+          </label>
+          <a href="lab/index.html" id="lab-link" class="btn-lab-link" title="Break down a Penobscot form">Break down in Lab &#8594;</a>
+        </div>
+      </div>
+      <div id="results" class="results"></div>
+      <p id="status" class="status"></p>
+      <div id="partial-results" class="partial-results"></div>
+    </section>
+    <section class="quick-browse">
+      <h2>Browse by sound</h2>
+      <div class="letter-grid" id="letter-grid"></div>
+    </section>
+    <script src="assets/lunr.min.js"></script>
+    <script src="assets/audio-player.js"></script>
+    <script src="assets/search.js"></script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

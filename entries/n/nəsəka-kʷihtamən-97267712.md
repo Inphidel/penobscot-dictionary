@@ -1,0 +1,23 @@
+---
+id: "4915553697267712"
+headword: nəsəkákʷihtamən
+part_of_speech: TI
+sub_part_of_speech: class 1a
+english: I vomit it
+browse_letters: ['n']
+audio:
+  - type: main
+    file: audio/112680.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/112680.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/4915553697267712/
+---
+
+# nəsəkákʷihtamən
+
+**Part of speech:** TI · class 1a
+
+**English:** I vomit it
+
+## Audio
+
+- [Main pronunciation](../audio/112680.mp3)

@@ -1,0 +1,19 @@
+---
+id: "5821053733437440"
+headword: seski-mkaséwəhawe
+english: pure black hair
+browse_letters: ['s']
+audio:
+  - type: main
+    file: audio/112655.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/112655.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/5821053733437440/
+---
+
+# seski-mkaséwəhawe
+
+**English:** pure black hair
+
+## Audio
+
+- [Main pronunciation](../audio/112655.mp3)

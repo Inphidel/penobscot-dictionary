@@ -1,0 +1,28 @@
+---
+id: "5276599519805440"
+headword: αməslápihke
+part_of_speech: AN
+english: spider (generic),
+browse_letters: ['α']
+audio:
+  - type: main
+    file: audio/102376.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/102376.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/5276599519805440/
+---
+
+# αməslápihke
+
+**Part of speech:** AN
+
+**English:** spider (generic),
+
+## Audio
+
+- [Main pronunciation](../audio/102376.mp3)
+
+## Examples
+
+| Penobscot | English | POS |
+|-----------|---------|-----|
+| αməslápihkak |  | pl. |

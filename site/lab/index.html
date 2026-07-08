@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="lab-page">
+  
+    <nav class="nav">
+      <a href="../index.html" class="brand">Penobscot Dictionary</a>
+      <a href="../index.html" class="">Search</a>
+      <a href="../browse.html" class="">Browse</a>
+      <a href="../lab/index.html" class="active">Lab</a>
+      <a href="../about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <header class="hero lab-hero">
+      <p class="badge-row"><span class="badge badge-lab">Experimental Lab — verify with audio &amp; speakers</span></p>
+      <h1>Lab</h1>
+      <p class="subtitle">Type English for possible Penobscot — or type a form you heard (plain letters OK)</p>
+    </header>
+
+    <section class="lab-panel">
+      <form id="guesser-form" class="guesser-form">
+        <label for="guesser-q">English or Penobscot</label>
+        <input type="text" id="guesser-q" placeholder="e.g. I am unable to control myself — or netacelihosi" autocomplete="off" autofocus>
+        <button type="submit" class="btn-analyze">Detect</button>
+      </form>
+      <p id="guesser-mode" class="lab-mode muted"></p>
+      <p class="lab-hint">The Lab guesses Penobscot from dictionary words and observed patterns. Results are <strong>not official</strong> — use Search/Browse for archive definitions, and verify with audio.</p>
+      <div id="breakdown-results" class="breakdown-results"></div>
+      <div id="guesser-status" class="status"></div>
+      <h3 id="guesser-subhead" class="lab-subhead">More possible matches</h3>
+      <div id="guesser-results" class="guesser-results"></div>
+    </section>
+
+    <section class="lab-panel kinship-panel">
+      <h2>Perspective &amp; kinship</h2>
+      <p class="muted">Browse by relationship, possession (my/his/her), age (older/younger), or word endings. Each entry shows <strong>pattern hints</strong> — guesses about which parts of the word may carry that meaning.</p>
+      <div id="kinship-cats" class="kinship-cats"></div>
+      <div id="kinship-results" class="kinship-results"></div>
+    </section>
+
+    <section class="lab-panel lab-affixes">
+      <h2>Common prefix patterns (mined from examples)</h2>
+      <p class="muted">Observed in the archive — not a complete grammar.</p>
+      <div id="affix-table-wrap"></div>
+    </section>
+
+    <section class="archive-panel about-section">
+      <h2>Looking for the official definition?</h2>
+      <p>Use <a href="../index.html">Search</a> or <a href="../browse.html">Browse</a> — green-tagged archive pages.</p>
+    </section>
+    <script src="../assets/audio-player.js"></script>
+    <script src="../assets/lab-guesser.js"></script>
+    <script src="../assets/kinship.js"></script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="../assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,26 @@
+---
+id: "6024789131001856"
+headword: ahsəwi-pάkʷahsən
+part_of_speech: II
+english: the moonlight is behind the clouds.
+browse_letters: ['a']
+audio:
+  - type: main
+    file: audio/100255.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/100255.mp3
+  - type: guide
+    file: audio/100255-gp.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/100255-gp.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/6024789131001856/
+---
+
+# ahsəwi-pάkʷahsən
+
+**Part of speech:** II
+
+**English:** the moonlight is behind the clouds.
+
+## Audio
+
+- [Main pronunciation](../audio/100255.mp3)
+- [Guide pronunciation](../audio/100255-gp.mp3)

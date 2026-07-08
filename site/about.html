@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  
+    <nav class="nav">
+      <a href="index.html" class="brand">Penobscot Dictionary</a>
+      <a href="index.html" class="">Search</a>
+      <a href="browse.html" class="">Browse</a>
+      <a href="lab/index.html" class="">Lab</a>
+      <a href="about.html" class="active">About</a>
+    </nav>
+  <main class="container">
+    
+    <header class="hero">
+      <h1>About this site</h1>
+      <p class="subtitle">Local study archive — not an official Penobscot Nation publication</p>
+    </header>
+
+    <section class="archive-panel about-section">
+      <h2>Archive (official source)</h2>
+      <p class="badge-row"><span class="badge badge-archive">Penobscot Dictionary — official archive</span></p>
+      <p>The <strong>Search</strong> and <strong>Browse</strong> sections are a local copy of the
+      <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+      online — 10,113 entries, 9,354 with audio recordings from the Penobscot Indian Nation,
+      University of Maine, and American Philosophical Society (Frank T. Siebert manuscript).</p>
+      <p>Archive text and audio are <em>not edited</em> by this project. Each entry links back to the official site.</p>
+    </section>
+
+    <section class="lab-panel about-section">
+      <h2>Lab (experimental)</h2>
+      <p class="badge-row"><span class="badge badge-lab">Experimental Lab — verify with audio &amp; speakers</span></p>
+      <p>The <strong>Lab</strong> section offers pattern tools that guess how word forms relate — prefix hints,
+      example matching, similar strings. Entry pages include an amber <strong>Related forms</strong> panel
+      (examples, synonyms, similar headwords). <strong>Search</strong> also shows amber <strong>partial matches</strong>
+      when you type a fragment of a Penobscot word. These are <em>not</em> authoritative definitions.</p>
+      <p>Always verify with the audio recordings and fluent speakers before trusting a Lab result.</p>
+      <p><a href="lab/index.html" class="btn-lab-cta">Open Lab — break down a form</a></p>
+    </section>
+
+    <section class="about-section">
+      <h2>How to run locally</h2>
+      <pre class="code-block">cd C:\Penobscot
+python -m http.server 8080 --directory site
+# open http://localhost:8080</pre>
+      <p>To refresh the archive from the official site: <code>python scripts/spider.py</code> then <code>python scripts/finish.py</code>.</p>
+      <p>To rebuild Lab pattern data: <code>python scripts/mine_affixes.py</code> then <code>python scripts/build_site.py</code>.</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

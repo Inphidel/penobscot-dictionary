@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse l | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  
+    <nav class="nav">
+      <a href="../index.html" class="brand">Penobscot Dictionary</a>
+      <a href="../index.html" class="">Search</a>
+      <a href="../browse.html" class="active">Browse</a>
+      <a href="../lab/index.html" class="">Lab</a>
+      <a href="../about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <h1>Browse: l</h1>
+    <p class="stats">5 entries — tap &#9654; to hear; tap again to repeat</p>
+    <div class="letter-search">
+      <input type="search" id="filter" placeholder="Filter this list..." autocomplete="off">
+    </div>
+    <table class="word-list" id="word-table">
+      <thead><tr><th>Penobscot</th><th></th><th>English</th><th><abbr class="pos-abbr" title="Part of speech — the word&#x27;s grammatical category in this dictionary (noun type, verb type, etc.)">POS</abbr></th></tr></thead>
+      <tbody><tr class="word-row" data-href="../entry/5811992963055616.html">
+          <td class="hw"><a href="../entry/5811992963055616.html">làhto</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/106324.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">† trump card,</td>
+          <td class="pos"><abbr class="pos-abbr" title="Animate noun — a person, animal, or other noun treated as grammatically animate">AN</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/5249043009634304.html">
+          <td class="hw"><a href="../entry/5249043009634304.html">lèhsəwis</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/106325.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">† a Jew,</td>
+          <td class="pos"><abbr class="pos-abbr" title="Animate noun — a person, animal, or other noun treated as grammatically animate">AN</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/6374942916476928.html">
+          <td class="hw"><a href="../entry/6374942916476928.html">lèməns</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/106326.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">† lemon,</td>
+          <td class="pos"><abbr class="pos-abbr" title="Inanimate noun — a thing, place, or idea treated as grammatically inanimate">INAN</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/6746593952792576.html">
+          <td class="hw"><a href="../entry/6746593952792576.html">lnəčəskáwαmα</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/103190.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">I am envious of him (in speech),</td>
+          <td class="pos"><abbr class="pos-abbr" title="Transitive animate verb — verb whose object is animate (a person or animal)">TA</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/4967568032923648.html">
+          <td class="hw"><a href="../entry/4967568032923648.html">lomάniye</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/106327.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">†</td>
+          <td class="pos"><abbr class="pos-abbr" title="Animate noun — a person, animal, or other noun treated as grammatically animate">AN</abbr></td>
+        </tr></tbody>
+    </table>
+    <script src="../assets/audio-player.js"></script>
+    <script>
+      PenobscotAudio.initPage();
+      document.getElementById('filter').addEventListener('input', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('#word-table .word-row').forEach(row => {
+          row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+      document.querySelectorAll('#word-table .word-row').forEach(row => {
+        row.addEventListener('click', e => {
+          if (e.target.closest('.btn-play')) return;
+          const href = row.dataset.href;
+          if (href) location.href = href;
+        });
+      });
+    </script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="../assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

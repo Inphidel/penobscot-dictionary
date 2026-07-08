@@ -1,0 +1,32 @@
+---
+id: "5833021928243200"
+headword: aləskánawe
+part_of_speech: AI
+english: 1) he weaves, fills (snowshoes), 2) he weaves ash wood strips, wicker, rushes, rattan, 3) he weaves mat,
+browse_letters: ['a']
+audio:
+  - type: main
+    file: audio/100869.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/100869.mp3
+  - type: guide
+    file: audio/100869-gp.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/100869-gp.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/5833021928243200/
+---
+
+# aləskánawe
+
+**Part of speech:** AI
+
+**English:** 1) he weaves, fills (snowshoes), 2) he weaves ash wood strips, wicker, rushes, rattan, 3) he weaves mat,
+
+## Audio
+
+- [Main pronunciation](../audio/100869.mp3)
+- [Guide pronunciation](../audio/100869-gp.mp3)
+
+## Examples
+
+| Penobscot | English | POS |
+|-----------|---------|-----|
+| nətələskánawe | I... |  |

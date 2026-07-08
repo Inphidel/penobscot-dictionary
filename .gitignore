@@ -1,0 +1,22 @@
+# MP3s live in site/audio/ for clone-and-serve mirrors (avoid duplicating ~230 MB)
+/audio/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local crawl resume state (entries.json is the source of truth)
+data/crawl_state.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.cursor/
+
+# Session / terminal captures (not part of the project)
+terminals/

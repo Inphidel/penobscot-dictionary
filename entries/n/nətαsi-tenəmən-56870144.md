@@ -1,0 +1,23 @@
+---
+id: "6490460356870144"
+headword: nətαsítenəmən
+part_of_speech: TI
+sub_part_of_speech: class 1b
+english: I return it (a borrowed item)
+browse_letters: ['n']
+audio:
+  - type: main
+    file: audio/102801.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/102801.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/6490460356870144/
+---
+
+# nətαsítenəmən
+
+**Part of speech:** TI · class 1b
+
+**English:** I return it (a borrowed item)
+
+## Audio
+
+- [Main pronunciation](../audio/102801.mp3)

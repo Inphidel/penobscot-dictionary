@@ -1,0 +1,28 @@
+---
+id: "5973180938190848"
+headword: wikəčákətonke
+part_of_speech: AI
+english: he likes to talk unnecessarily,
+browse_letters: ['w']
+audio:
+  - type: main
+    file: audio/115496.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/115496.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/5973180938190848/
+---
+
+# wikəčákətonke
+
+**Part of speech:** AI
+
+**English:** he likes to talk unnecessarily,
+
+## Audio
+
+- [Main pronunciation](../audio/115496.mp3)
+
+## Examples
+
+| Penobscot | English | POS |
+|-----------|---------|-----|
+| nəwikəčákətonke | I... |  |

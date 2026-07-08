@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse h | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  
+    <nav class="nav">
+      <a href="../index.html" class="brand">Penobscot Dictionary</a>
+      <a href="../index.html" class="">Search</a>
+      <a href="../browse.html" class="active">Browse</a>
+      <a href="../lab/index.html" class="">Lab</a>
+      <a href="../about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <h1>Browse: h</h1>
+    <p class="stats">5 entries — tap &#9654; to hear; tap again to repeat</p>
+    <div class="letter-search">
+      <input type="search" id="filter" placeholder="Filter this list..." autocomplete="off">
+    </div>
+    <table class="word-list" id="word-table">
+      <thead><tr><th>Penobscot</th><th></th><th>English</th><th><abbr class="pos-abbr" title="Part of speech — the word&#x27;s grammatical category in this dictionary (noun type, verb type, etc.)">POS</abbr></th></tr></thead>
+      <tbody><tr class="word-row" data-href="../entry/4807878867156992.html">
+          <td class="hw"><a href="../entry/4807878867156992.html">hai hai hai yā hai</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/104088.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">Penobscot War Whoop</td>
+          <td class="pos"></td>
+        </tr><tr class="word-row" data-href="../entry/5933778773999616.html">
+          <td class="hw"><a href="../entry/5933778773999616.html">heka, heka</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/104089.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">Sounds used to drown out greeting songs of other tribes when two nations met.</td>
+          <td class="pos"><abbr class="pos-abbr" title="Interjection — exclamation or call (not a full sentence)">interj.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/5722672541466624.html">
+          <td class="hw"><a href="../entry/5722672541466624.html">hma</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/104091.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">smell it.</td>
+          <td class="pos"><abbr class="pos-abbr" title="By the way — editor&#x27;s aside in the source manuscript">b.t.w.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/5159722588045312.html">
+          <td class="hw"><a href="../entry/5159722588045312.html">hneˊ</a></td>
+          <td class="play-cell"><div class="play-group"></div></td>
+          <td class="en">Hark! Listen! Hist!</td>
+          <td class="pos"><abbr class="pos-abbr" title="Imperative — command form">imper.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/6285622494887936.html">
+          <td class="hw"><a href="../entry/6285622494887936.html">hwə hwə</a></td>
+          <td class="play-cell"><div class="play-group"></div></td>
+          <td class="en">[onomatopoeia for bark of dog] bow-wow!</td>
+          <td class="pos"><abbr class="pos-abbr" title="Interjection — exclamation or call (not a full sentence)">interj.</abbr></td>
+        </tr></tbody>
+    </table>
+    <script src="../assets/audio-player.js"></script>
+    <script>
+      PenobscotAudio.initPage();
+      document.getElementById('filter').addEventListener('input', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('#word-table .word-row').forEach(row => {
+          row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+      document.querySelectorAll('#word-table .word-row').forEach(row => {
+        row.addEventListener('click', e => {
+          if (e.target.closest('.btn-play')) return;
+          const href = row.dataset.href;
+          if (href) location.href = href;
+        });
+      });
+    </script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="../assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

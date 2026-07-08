@@ -1,0 +1,775 @@
+{
+  "meta": {
+    "source": "entries.json",
+    "prefix_rules": 80,
+    "example_labels": 40,
+    "indexed_forms": 18388,
+    "base_words": 9660,
+    "sentence_examples": 1680,
+    "english_index": 9972
+  },
+  "prefixes": [
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "first person singular",
+      "count": 3060,
+      "sample": "àtso → nə̀tatsi"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "first person singular",
+      "count": 785,
+      "sample": "ačélohse → nətačélohse"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "first person singular",
+      "count": 356,
+      "sample": "ačélihoso → nətačélihosi"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "pl.",
+      "count": 211,
+      "sample": "mačatahkéwαkan → mačatahkéwαkanal"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "pl.",
+      "count": 198,
+      "sample": "αpíkʷsehso → kči-αpíkʷsehsəwak;"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "pl.",
+      "count": 197,
+      "sample": "|ahsal-| → wətahsálomal"
+    },
+    {
+      "prefix": "nətα",
+      "prefix_ascii": "neta",
+      "hint": "first person singular",
+      "count": 190,
+      "sample": "αhčelíkemo → nətαhčelíkemi"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "pl.",
+      "count": 182,
+      "sample": "|ahpih-| → ppihanáskαnak;"
+    },
+    {
+      "prefix": "t",
+      "prefix_ascii": "t",
+      "hint": "pl.",
+      "count": 76,
+      "sample": "nətásimα → tasitólətəwak"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "my...",
+      "count": 63,
+      "sample": "číləsαwan → nəčíləsαwan"
+    },
+    {
+      "prefix": "α",
+      "prefix_ascii": "a",
+      "hint": "pl.",
+      "count": 59,
+      "sample": "αkawahtáhikan → αkawahtáhikanal"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "my...,",
+      "count": 35,
+      "sample": "àsip → nə́tasip"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "my...",
+      "count": 30,
+      "sample": "akʷímoti → nətakʷímotim"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "my...",
+      "count": 28,
+      "sample": "áhkihkαn → nətáhkihkαn"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "they...,",
+      "count": 23,
+      "sample": "kàwo → kawólətəwak"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "example form",
+      "count": 20,
+      "sample": "čeht → nə̀čehtəm"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "where...",
+      "count": 19,
+      "sample": "kə̀pikən → kə́pikək"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "pl.",
+      "count": 18,
+      "sample": "čàkikʷ → nəčákikomak"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "his...",
+      "count": 17,
+      "sample": "àlohsəwe → wətálohsəkol"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "third person plural",
+      "count": 17,
+      "sample": "káwatən → káwatənol"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "syn.",
+      "count": 16,
+      "sample": "čawáhpənikan → kəlahpskʷáhikan"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "we...,",
+      "count": 15,
+      "sample": "čəčahkómo → nəčəčahkʷimólətipəna"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "my...,",
+      "count": 14,
+      "sample": "àlohsəwe → nətàlohsəkʷ"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "my...;",
+      "count": 14,
+      "sample": "matαpitéhposo → nəmatαpitéhposi"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "third person plural",
+      "count": 13,
+      "sample": "ìtam → wətítamənα"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "third person animate",
+      "count": 13,
+      "sample": "nəčawáhpənəmən → wəčawáhpənəmən"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "third person plural",
+      "count": 13,
+      "sample": "pečonséwo → pečóhsewəwal"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "Syn:",
+      "count": 12,
+      "sample": "apətékisəkat → kisəwə́kisəkat."
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "pl.",
+      "count": 11,
+      "sample": "áhahso → nətaháhsomak"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "first person plural",
+      "count": 11,
+      "sample": "kísəwəkʷso → nəkisəwəkʷsólətipəna"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "we...,",
+      "count": 10,
+      "sample": "álihle → nətəlíhlαpəna"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "contains headword",
+      "count": 10,
+      "sample": "čihčikʷímase → nəčihčikʷímase"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "my...,",
+      "count": 10,
+      "sample": "ččàyis → nətahčáyisəm"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "Syn:",
+      "count": 10,
+      "sample": "pimskʷάkiko → wὰkəčeskʷ"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "third person plural",
+      "count": 9,
+      "sample": "mačínαkʷəso → mačinαkʷəsólətəwak"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "we...,",
+      "count": 8,
+      "sample": "ákhike → nətakhíkepəna"
+    },
+    {
+      "prefix": "nətα",
+      "prefix_ascii": "neta",
+      "hint": "pl.",
+      "count": 8,
+      "sample": "αkóskʷeson → nətαkoskʷésonəkal"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "his...,",
+      "count": 8,
+      "sample": "čə̀čahkʷ → wəčə̀čahkol"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "Syn:",
+      "count": 8,
+      "sample": "pítahte → pítahkʷəte"
+    },
+    {
+      "prefix": "t",
+      "prefix_ascii": "t",
+      "hint": "third person plural",
+      "count": 8,
+      "sample": "tákʷαkso → takʷαksólətəwak"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "Syn:",
+      "count": 7,
+      "sample": "amehsakahkʷikánehle → mamtahkʷikánehle"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "i..",
+      "count": 7,
+      "sample": "čačáhkʷikane → nəčačáhkʷikana"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "my own...",
+      "count": 7,
+      "sample": "číləsαwan → nəčíləsαwanəm"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "example form",
+      "count": 6,
+      "sample": "ačitαkʷahíkewəso → nətačitαkʷahíkewəsi"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "my...;",
+      "count": 6,
+      "sample": "áhahso → nətáhahsom"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "pl.",
+      "count": 6,
+      "sample": "àsip → nətásipak"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "syn.",
+      "count": 6,
+      "sample": "αmάkehso → mαmάkehso"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "i am...",
+      "count": 6,
+      "sample": "kči-sénαpawo → nəkihči-sénαpayi"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "where...",
+      "count": 6,
+      "sample": "pə̀matəne → pématənek"
+    },
+    {
+      "prefix": "w",
+      "prefix_ascii": "w",
+      "hint": "example form",
+      "count": 6,
+      "sample": "wačápkαtakʷ → wačapákαtakol"
+    },
+    {
+      "prefix": "α",
+      "prefix_ascii": "a",
+      "hint": "third person plural",
+      "count": 5,
+      "sample": "αmkewíno → αmkewínəwak"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "i...,",
+      "count": 5,
+      "sample": "čəpáhkαtam → nəčəpáhkαtam"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "first person singular",
+      "count": 5,
+      "sample": "kčáwayəss → kčáwayəss nəkátoksi"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "they...,",
+      "count": 5,
+      "sample": "mačínαkʷəso → mačinάkʷəsəwak"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "dl.",
+      "count": 5,
+      "sample": "matamkάtamo → matamkάtaməwak"
+    },
+    {
+      "prefix": "el",
+      "prefix_ascii": "el",
+      "hint": "pl.",
+      "count": 4,
+      "sample": "alhάkəmαso → elhαkəmάsikil"
+    },
+    {
+      "prefix": "α",
+      "prefix_ascii": "a",
+      "hint": "they...,",
+      "count": 4,
+      "sample": "αkáwahte → αkáwahtal"
+    },
+    {
+      "prefix": "nətα",
+      "prefix_ascii": "neta",
+      "hint": "first person plural",
+      "count": 4,
+      "sample": "αmátəwak → nətαmátipəna"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "thou...,",
+      "count": 4,
+      "sample": "čəpáhkαtam → kəčəpáhkαtam"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "second person",
+      "count": 4,
+      "sample": "ehetawi-kikitáhkʷikane → khetawi-kikitáhkʷikana"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "syn:",
+      "count": 4,
+      "sample": "kəsαtəkʷehtáhoke → nəpapαmαtəkʷáhoke"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "syn.",
+      "count": 4,
+      "sample": "mehčinéwino → nə̀pəwino"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "dim.",
+      "count": 4,
+      "sample": "pipíkʷehso → pipíkʷehsis"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "they...,",
+      "count": 4,
+      "sample": "píwsəsso → píwsəssəwak"
+    },
+    {
+      "prefix": "nəta",
+      "prefix_ascii": "neta",
+      "hint": "my...;",
+      "count": 4,
+      "sample": "skánimin → nətaskaníminəm"
+    },
+    {
+      "prefix": "t",
+      "prefix_ascii": "t",
+      "hint": "they...,",
+      "count": 4,
+      "sample": "tákʷαkso → takʷαksólətəwak"
+    },
+    {
+      "prefix": "el",
+      "prefix_ascii": "el",
+      "hint": "when...",
+      "count": 3,
+      "sample": "alaskéhtehsin → elaskéhtehsit"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "example form",
+      "count": 3,
+      "sample": "áləwale → nətáləwale"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "my own...,",
+      "count": 3,
+      "sample": "čə̀čahkʷ → nəčə̀čahkom"
+    },
+    {
+      "prefix": "nət",
+      "prefix_ascii": "net",
+      "hint": "first person plural",
+      "count": 3,
+      "sample": "esónike → nətesoníkepəna"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "they are...",
+      "count": 3,
+      "sample": "kikimsətaməwíno → kikimsətaməwínowak"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "dl.",
+      "count": 3,
+      "sample": "kínhake → kínhakak"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "they...;",
+      "count": 3,
+      "sample": "kske → kskal"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "where there is...",
+      "count": 3,
+      "sample": "kʷəsαwáhkʷihke → kʷesαwáhkʷihkek"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "dim.",
+      "count": 3,
+      "sample": "mačawíhkhikan → mačawihkhíkanəss"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "dim.,",
+      "count": 3,
+      "sample": "míhkəwαlohs → mihkəwάlohsis"
+    },
+    {
+      "prefix": "m",
+      "prefix_ascii": "m",
+      "hint": "they...;",
+      "count": 3,
+      "sample": "mòso → mòsəwak"
+    },
+    {
+      "prefix": "nə",
+      "prefix_ascii": "ne",
+      "hint": "Syn:",
+      "count": 3,
+      "sample": "nəmikáhkαlα → nəmikáhkαmα,"
+    },
+    {
+      "prefix": "k",
+      "prefix_ascii": "k",
+      "hint": "i...  thee",
+      "count": 3,
+      "sample": "nətə̀lkʷahα → kətə̀lkʷahol"
+    },
+    {
+      "prefix": "p",
+      "prefix_ascii": "p",
+      "hint": "example form",
+      "count": 3,
+      "sample": "piləwahkíwino → piləwahkiwínəwak"
+    }
+  ],
+  "example_labels": [
+    {
+      "label": "pl.",
+      "count": 1776,
+      "sample": "ačikαwikésəwαkan: ačikαwikésəwαkanal"
+    },
+    {
+      "label": "c. conj.",
+      "count": 184,
+      "sample": "àhəle: →ὰhəlek"
+    },
+    {
+      "label": "dl.",
+      "count": 126,
+      "sample": "ákhike: ákhikak"
+    },
+    {
+      "label": "loc.",
+      "count": 123,
+      "sample": "akʷə́skʷahan: akʷəskʷáhanok"
+    },
+    {
+      "label": "part.",
+      "count": 104,
+      "sample": "áčeləmo: →éčeləmit"
+    },
+    {
+      "label": "imper.",
+      "count": 82,
+      "sample": "ákitam: →ákita"
+    },
+    {
+      "label": "conj.",
+      "count": 69,
+      "sample": "alahkəčímehso: alahkəčímehsək"
+    },
+    {
+      "label": "Syn:",
+      "count": 62,
+      "sample": "amehkάmelko: pənάmelko"
+    },
+    {
+      "label": "syn.",
+      "count": 56,
+      "sample": "ačitawαmkʷéwapo: "
+    },
+    {
+      "label": "dim.",
+      "count": 56,
+      "sample": "ačə́ssahtəkʷe: ačəssáhtəkʷehsis"
+    },
+    {
+      "label": "coast.",
+      "count": 40,
+      "sample": "alahkésαwe: alkésαwe"
+    },
+    {
+      "label": "subj.",
+      "count": 36,
+      "sample": "alálohke: alalohkáne"
+    },
+    {
+      "label": "redupl.",
+      "count": 20,
+      "sample": "ahəli-: ali-"
+    },
+    {
+      "label": "inl.",
+      "count": 20,
+      "sample": "alahkésαwe: nətəlahkésαwe"
+    },
+    {
+      "label": "pers. N.",
+      "count": 19,
+      "sample": "aláhpskαlo: "
+    },
+    {
+      "label": "emp.",
+      "count": 18,
+      "sample": "ahάči: →ahάčitte"
+    },
+    {
+      "label": "pass.",
+      "count": 15,
+      "sample": "nəkəlahlákəhα: kəlahlákəhα"
+    },
+    {
+      "label": "arch.",
+      "count": 14,
+      "sample": "apákskote: apakáskote"
+    },
+    {
+      "label": "ext. rt.",
+      "count": 13,
+      "sample": "|αsit-|: |αsite-|"
+    },
+    {
+      "label": "prior.",
+      "count": 12,
+      "sample": "ákʷitən: wətakʷítənome"
+    },
+    {
+      "label": "AN part.",
+      "count": 12,
+      "sample": "àtso: ètsit"
+    },
+    {
+      "label": "obv. sg.",
+      "count": 12,
+      "sample": "čeht: wəčéhtomal"
+    },
+    {
+      "label": "amb.",
+      "count": 10,
+      "sample": "ačitəkʷəssin: →isikani-ačítəkʷəssin"
+    },
+    {
+      "label": "dim.,",
+      "count": 10,
+      "sample": "anéhtahso: anéhtahsis"
+    },
+    {
+      "label": "int. poss.",
+      "count": 10,
+      "sample": "αttólhαwe: nətαttólhαwem"
+    },
+    {
+      "label": "syn:",
+      "count": 10,
+      "sample": "čímkʷαhα: nohkhámənəsso"
+    },
+    {
+      "label": "obv.",
+      "count": 9,
+      "sample": "alintə́hʷαso: alintə́hʷαsəwal"
+    },
+    {
+      "label": "pc.",
+      "count": 9,
+      "sample": "|ahpαt-|: ppὰči"
+    },
+    {
+      "label": "SAI",
+      "count": 8,
+      "sample": "áwotəwak: áwotin"
+    },
+    {
+      "label": "AI",
+      "count": 8,
+      "sample": "|ahčehkwən-|: →ččehkʷənatáwαpo"
+    },
+    {
+      "label": "sg.",
+      "count": 8,
+      "sample": "αkʷάmelətol: "
+    },
+    {
+      "label": "ant.",
+      "count": 8,
+      "sample": "čačαpáməkʷe: kʷənαpáməkʷe"
+    },
+    {
+      "label": "lit.",
+      "count": 8,
+      "sample": "čílənαsit: "
+    },
+    {
+      "label": "Ant",
+      "count": 8,
+      "sample": "kpakátekəne: wasapátekəne"
+    },
+    {
+      "label": "no pl.",
+      "count": 7,
+      "sample": "ákʷitənihkʷ: "
+    },
+    {
+      "label": "Syn.",
+      "count": 7,
+      "sample": "ali-čitámənike: čitámənike."
+    },
+    {
+      "label": "pl. excl.",
+      "count": 7,
+      "sample": "álohke: nətalohkhátipəna"
+    },
+    {
+      "label": "distrib. loc.",
+      "count": 7,
+      "sample": "alənαpáyihke: alənαpáyihkok"
+    },
+    {
+      "label": "II",
+      "count": 7,
+      "sample": "atóčeyo: it is that time, of that period."
+    },
+    {
+      "label": "lit",
+      "count": 7,
+      "sample": "čóhskəpehso: čóhskəpehsəwak"
+    }
+  ]
+}

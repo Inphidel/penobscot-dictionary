@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse kkʷ | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  
+    <nav class="nav">
+      <a href="../index.html" class="brand">Penobscot Dictionary</a>
+      <a href="../index.html" class="">Search</a>
+      <a href="../browse.html" class="active">Browse</a>
+      <a href="../lab/index.html" class="">Lab</a>
+      <a href="../about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <h1>Browse: kkʷ</h1>
+    <p class="stats">7 entries — tap &#9654; to hear; tap again to repeat</p>
+    <div class="letter-search">
+      <input type="search" id="filter" placeholder="Filter this list..." autocomplete="off">
+    </div>
+    <table class="word-list" id="word-table">
+      <thead><tr><th>Penobscot</th><th></th><th>English</th><th><abbr class="pos-abbr" title="Part of speech — the word&#x27;s grammatical category in this dictionary (noun type, verb type, etc.)">POS</abbr></th></tr></thead>
+      <tbody><tr class="word-row" data-href="../entry/5630452211646464.html">
+          <td class="hw"><a href="../entry/5630452211646464.html">kkʷáčəmi</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/105855.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">on the outside, the out-of-doors;</td>
+          <td class="pos"><abbr class="pos-abbr" title="Particle — a small grammatical word that is not a full noun or verb">pc.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/4660752212295680.html">
+          <td class="hw"><a href="../entry/4660752212295680.html">kkʷèhehč</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/105861.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">whoops.</td>
+          <td class="pos"><abbr class="pos-abbr" title="Interjection — exclamation or call (not a full sentence)">interj.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/4786027281514496.html">
+          <td class="hw"><a href="../entry/4786027281514496.html">kkʷēyˊ</a></td>
+          <td class="play-cell"><div class="play-group"></div></td>
+          <td class="en">Hello!</td>
+          <td class="pos"><abbr class="pos-abbr" title="Interjection — exclamation or call (not a full sentence)">interj.</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/5348977234935808.html">
+          <td class="hw"><a href="../entry/5348977234935808.html">kkʷìnaˊ</a></td>
+          <td class="play-cell"><div class="play-group"></div></td>
+          <td class="en">Isn&#x27;t it?</td>
+          <td class="pos"><span class="pos-plain">interog.</span></td>
+        </tr><tr class="word-row" data-href="../entry/5911927188357120.html">
+          <td class="hw"><a href="../entry/5911927188357120.html">kkʷíhtkʷepo</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/105859.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">he sits alone,</td>
+          <td class="pos"><abbr class="pos-abbr" title="Animate intransitive verb — verb with an animate subject (person/animal), no object">AI</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/5067502258225152.html">
+          <td class="hw"><a href="../entry/5067502258225152.html">kkʷὰhas</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/105856.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">baneberry, snakeroot, cohosh ⟨sciname⟩(Genus actaea: Actaea rubra (Aiton) Willdenow and Actaea pachypoda Elliot), ⟨/scin</td>
+          <td class="pos"><abbr class="pos-abbr" title="Inanimate noun — a thing, place, or idea treated as grammatically inanimate">INAN</abbr></td>
+        </tr><tr class="word-row" data-href="../entry/6193402165067776.html">
+          <td class="hw"><a href="../entry/6193402165067776.html">kkʷάphikan</a></td>
+          <td class="play-cell"><div class="play-group"><button type="button" class="btn-play btn-play-sm" data-audio="../audio/105857.mp3" title="Play — tap again to repeat">&#9654;</button></div></td>
+          <td class="en">net, scooping fishing net, hand net with handle,</td>
+          <td class="pos"><abbr class="pos-abbr" title="Inanimate noun — a thing, place, or idea treated as grammatically inanimate">INAN</abbr></td>
+        </tr></tbody>
+    </table>
+    <script src="../assets/audio-player.js"></script>
+    <script>
+      PenobscotAudio.initPage();
+      document.getElementById('filter').addEventListener('input', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('#word-table .word-row').forEach(row => {
+          row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+      document.querySelectorAll('#word-table .word-row').forEach(row => {
+        row.addEventListener('click', e => {
+          if (e.target.closest('.btn-play')) return;
+          const href = row.dataset.href;
+          if (href) location.href = href;
+        });
+      });
+    </script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="../assets/pos-tooltips.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,29 @@
+---
+id: "6416037163565056"
+headword: nóhsohkam
+part_of_speech: OTI
+sub_part_of_speech: class 1a
+english: he follows,
+browse_letters: ['n']
+audio:
+  - type: main
+    file: audio/109429.mp3
+    remote: https://storage.googleapis.com/penobscot_dictionary_audiofile_storage/109429.mp3
+source_url: https://penobscot-dictionary.appspot.com/entry/6416037163565056/
+---
+
+# nóhsohkam
+
+**Part of speech:** OTI · class 1a
+
+**English:** he follows,
+
+## Audio
+
+- [Main pronunciation](../audio/109429.mp3)
+
+## Examples
+
+| Penobscot | English | POS |
+|-----------|---------|-----|
+| nənóhsohkam | I... |  |
