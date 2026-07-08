@@ -573,33 +573,60 @@ def build_about_page(meta: dict) -> str:
     </header>
 
     <section class="archive-panel about-section">
-      <h2>Archive (official source)</h2>
+      <h2>Archive (official text)</h2>
       <p class="badge-row">{badge_archive()}</p>
       <p>The <strong>Search</strong> and <strong>Browse</strong> sections are a local copy of the
       <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
       online — {total:,} entries, {with_audio:,} with audio recordings from the Penobscot Indian Nation,
       University of Maine, and American Philosophical Society (Frank T. Siebert manuscript).</p>
-      <p>Archive text and audio are <em>not edited</em> by this project. Each entry links back to the official site.</p>
+      <p>Headwords, definitions, and examples match the official archive. Each entry links back to the official site.</p>
+      <p><strong>Audio in this mirror</strong> has been loudness-normalized (~-15 LUFS) so recordings are easier to hear
+      on phones and laptops. That is a study convenience only — not a change to the linguistic content.
+      Hover part-of-speech labels (AI, INAN, Initial, …) for short explanations.</p>
     </section>
 
     <section class="lab-panel about-section">
       <h2>Lab (experimental)</h2>
       <p class="badge-row">{badge_lab()}</p>
-      <p>The <strong>Lab</strong> section offers pattern tools that guess how word forms relate — prefix hints,
-      example matching, similar strings. Entry pages include an amber <strong>Related forms</strong> panel
-      (examples, synonyms, similar headwords). <strong>Search</strong> also shows amber <strong>partial matches</strong>
-      when you type a fragment of a Penobscot word. These are <em>not</em> authoritative definitions.</p>
-      <p>Always verify with the audio recordings and fluent speakers before trusting a Lab result.</p>
-      <p><a href="lab/index.html" class="btn-lab-cta">Open Lab — break down a form</a></p>
+      <p>The <strong>Lab</strong> is for learners without special keyboard fluency. Everything it shows is labeled
+      <strong>system detection</strong> — pattern guesses, not official Penobscot.</p>
+      <ul>
+        <li><strong>English → possible Penobscot</strong> — type normal English; the Lab matches dictionary definitions and suggests forms (with reasoning).</li>
+        <li><strong>Penobscot → possible meaning</strong> — type a form you heard (plain letters OK); shows meaning first, then prefix/stem guesses.</li>
+        <li><strong>Perspective &amp; kinship</strong> — browse by mother, father, child, my/his/her, older/younger, feminine endings, etc., with pattern hints.</li>
+      </ul>
+      <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel; <strong>Search</strong> shows amber
+      <strong>partial matches</strong> when you type a fragment of a word.</p>
+      <p>Always verify with audio and fluent speakers before trusting a Lab result.</p>
+      <p><a href="lab/index.html" class="btn-lab-cta">Open Lab</a></p>
     </section>
 
     <section class="about-section">
       <h2>How to run locally</h2>
-      <pre class="code-block">cd C:\\Penobscot
-python -m http.server 8080 --directory site
+      <p><strong>Windows:</strong> run <code>restart.bat</code> in the project folder, then open http://localhost:8080</p>
+      <pre class="code-block">python -m http.server 8080 --directory site
 # open http://localhost:8080</pre>
-      <p>To refresh the archive from the official site: <code>python scripts/spider.py</code> then <code>python scripts/finish.py</code>.</p>
-      <p>To rebuild Lab pattern data: <code>python scripts/mine_affixes.py</code> then <code>python scripts/build_site.py</code>.</p>
+      <p>Audio must be served over http/https — opening HTML files directly will not play recordings.</p>
+    </section>
+
+    <section class="about-section">
+      <h2>For maintainers — updating the mirror</h2>
+      <p>This distribution ships with <strong>normalized audio already applied</strong>. Most users only need
+      <code>git pull</code> (or copy the <code>site/</code> folder) and serve it.</p>
+      <p>The official online dictionary appears stable and may not receive frequent updates. Re-crawling is
+      <em>optional</em> and mainly for operators who want to check for new entries.</p>
+      <p><strong>Important:</strong> re-downloading from the official site replaces MP3s with the original quiet
+      recordings. If you run a refresh, also re-apply loudness normalization:</p>
+      <pre class="code-block">pip install -r requirements.txt
+python scripts/spider.py          # optional — re-crawl official site
+python scripts/finish.py          # rebuild data + site (overwrites quiet audio)
+python scripts/normalize_audio.py # restore comfortable listening level
+python scripts/build_site.py      # if you changed scripts only</pre>
+      <p>Rebuild Lab pattern indexes only (no crawl):</p>
+      <pre class="code-block">python scripts/mine_affixes.py
+python scripts/mine_kinship.py
+python scripts/build_site.py</pre>
+      <p>Originals before normalization are kept in <code>audio_original/</code> (local backup, not required for serving).</p>
     </section>"""
     return page_shell("About", body, active="about")
 
@@ -1185,6 +1212,8 @@ STYLE_CSS = textwrap.dedent("""\
     .btn-lab-cta:hover { opacity: 0.9; }
     .about-section { margin-bottom: 2rem; }
     .about-section h2 { color: var(--accent); margin-bottom: 0.75rem; font-size: 1.15rem; }
+    .about-section ul { margin: 0.5rem 0 0.75rem 1.25rem; line-height: 1.55; }
+    .about-section li { margin-bottom: 0.35rem; }
     .lab-panel.about-section h2 { color: var(--lab-accent); }
     .code-block { background: #2d2d2d; color: #f0f0f0; padding: 1rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.85rem; }
     .guesser-form { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; margin-bottom: 1rem; }

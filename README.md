@@ -59,7 +59,9 @@ git pull
 
 Local development keeps a separate `audio/` folder (junctioned to `site/audio/`). Only `site/audio/` is committed so mirrors get one copy of the recordings.
 
-## Re-crawl or rebuild from scratch
+## Re-crawl or rebuild (maintainers)
+
+The published mirror includes **loudness-normalized audio**. Re-crawling the official site is optional (the online dictionary rarely changes) but **will replace MP3s with quieter originals** unless you normalize again.
 
 ```bash
 pip install -r requirements.txt
@@ -67,9 +69,10 @@ pip install -r requirements.txt
 # If rebuilding: link audio for scripts (Linux/macOS)
 ln -sf site/audio audio
 
-python scripts/spider.py          # crawl official site (resumable)
-python scripts/finish.py          # audio + markdown + site
-# or: python scripts/build_site.py
+python scripts/spider.py          # optional — re-crawl official site
+python scripts/finish.py          # rebuild data + site
+python scripts/normalize_audio.py # required after crawl — restore ~-15 LUFS
+# or site-only: python scripts/build_site.py
 ```
 
 ## Using the site
@@ -101,4 +104,4 @@ python scripts/normalize_audio.py        # process all site/audio MP3s
 
 ## Attribution
 
-Archive text and audio are not edited by this project. Each entry links to the official Penobscot Dictionary. Lab tools are local experiments, not Penobscot Nation publications.
+Archive **text** matches the official Penobscot Dictionary; each entry links back. **Audio** is loudness-normalized for study in this mirror (content unchanged). Lab tools are local experiments, not Penobscot Nation publications.
