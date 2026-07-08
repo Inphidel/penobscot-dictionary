@@ -46,6 +46,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
 .btn-lab-cta:hover { opacity: 0.9; }
 .about-section { margin-bottom: 2rem; }
 .about-section h2 { color: var(--accent); margin-bottom: 0.75rem; font-size: 1.15rem; }
+.about-section ul { margin: 0.5rem 0 0.75rem 1.25rem; line-height: 1.55; }
+.about-section li { margin-bottom: 0.35rem; }
 .lab-panel.about-section h2 { color: var(--lab-accent); }
 .code-block { background: #2d2d2d; color: #f0f0f0; padding: 1rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.85rem; }
 .guesser-form { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; margin-bottom: 1rem; }
