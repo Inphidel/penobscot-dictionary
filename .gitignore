@@ -1,6 +1,9 @@
 # MP3s live in site/audio/ for clone-and-serve mirrors (avoid duplicating ~230 MB)
 /audio/
 
+# Local backup before loudness normalization (keep on disk, not in git)
+/audio_original/
+
 # Python
 __pycache__/
 *.py[cod]

@@ -13,6 +13,16 @@ A complete local backup of the [Penobscot Dictionary](https://penobscot-dictiona
 | Audio files (.mp3) | **10,396** |
 | Browse sections | **26** |
 
+## Quick start (Windows)
+
+After clone or download, from the project folder:
+
+```bat
+restart.bat
+```
+
+Opens http://localhost:8080 (frees port 8080 if something is stuck, then starts the site).
+
 ## Install your own mirror (Option A — pre-built site)
 
 This repo includes a **ready-to-serve** `site/` folder (HTML, search indexes, Lab tools, and audio under `site/audio/`).
@@ -21,7 +31,8 @@ This repo includes a **ready-to-serve** `site/` folder (HTML, search indexes, La
 git clone https://github.com/Inphidel/penobscot-dictionary.git
 cd penobscot-dictionary
 
-# Audio must be served over http/https (not file://)
+# Windows: restart.bat
+# Or manually (audio must be served over http/https, not file://):
 python -m http.server 8080 --directory site
 # Open http://localhost:8080
 ```
@@ -77,6 +88,15 @@ Archive pages (green) are official dictionary copies. Lab pages (amber) are **ex
 python scripts/mine_affixes.py
 python scripts/mine_kinship.py
 python scripts/build_site.py
+```
+
+## Audio loudness (optional)
+
+Dictionary recordings vary in level. To normalize local MP3s to ~-15 LUFS (originals saved to `audio_original/`):
+
+```powershell
+python scripts/measure_loudness.py 20    # sample current levels
+python scripts/normalize_audio.py        # process all site/audio MP3s
 ```
 
 ## Attribution
