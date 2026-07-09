@@ -19,6 +19,7 @@ from common import (
     ENTRIES_JSON,
     KINSHIP_INDEX_JSON,
     GUESSER_FORMS_JSON,
+    SEMANTIC_TAGS_JSON,
     SENTENCE_EXAMPLES_JSON,
     SITE_DIR,
     SITE_MIRROR_URL,
@@ -330,6 +331,87 @@ def find_neighbors(entry: dict, by_letter: dict[str, list], limit: int = 6) -> l
     return [(item[1], item[2]) for item in hits[:limit]]
 
 
+# Prefer lemma/meta over broad themes when ranking meaning-related neighbors.
+_SPECIFICITY_RANK = {"lemma": 0, "meta": 1, "theme": 2}
+
+
+def find_semantic_neighbors(
+    entry: dict,
+    entries: dict,
+    semantic_index: dict | None,
+    *,
+    exclude_ids: set[str] | None = None,
+    limit: int = 6,
+) -> list[tuple[dict, str]]:
+    """Entries sharing semantic tags from English glosses (Lab experimental)."""
+    if not semantic_index:
+        return []
+    by_entry = semantic_index.get("by_entry") or {}
+    by_tag = semantic_index.get("by_tag") or {}
+    tag_meta = {t["id"]: t for t in (semantic_index.get("tags") or [])}
+
+    my_hits = by_entry.get(entry["id"]) or []
+    # Prefer high/medium confidence tags; drop pure broad noise if we have lemmas
+    usable = [h for h in my_hits if h.get("confidence") in ("high", "medium", "low")]
+    if not usable:
+        return []
+
+    lemmas = [h for h in usable if h.get("specificity") == "lemma"]
+    meta_tags = [h for h in usable if h.get("specificity") == "meta" and h.get("tag_id") != "species"]
+    themes = [h for h in usable if h.get("specificity") == "theme"]
+    # species alone is too broad; use with animal/plant lemmas
+    primary = lemmas or meta_tags or themes
+    if not primary:
+        return []
+
+    seen = {entry["id"]}
+    if exclude_ids:
+        seen |= exclude_ids
+
+    my_pos = (entry.get("part_of_speech") or "").strip()
+    scored: dict[str, tuple[int, str, dict]] = {}
+
+    for hit in sorted(primary, key=lambda h: _SPECIFICITY_RANK.get(h.get("specificity"), 9)):
+        tid = hit["tag_id"]
+        spec = hit.get("specificity") or "theme"
+        label = hit.get("label") or tag_meta.get(tid, {}).get("label") or tid
+        # Skip ultra-broad themes when we already have lemmas (avoid "water" flooding)
+        if lemmas and spec == "theme" and tid in ("water", "people", "food", "plant", "tree"):
+            continue
+        weight = {"lemma": 100, "meta": 40, "theme": 20}.get(spec, 10)
+        for card in by_tag.get(tid) or []:
+            oid = card.get("entry_id")
+            if not oid or oid in seen:
+                continue
+            other = entries.get(oid)
+            if not other:
+                continue
+            conf = card.get("confidence") or "medium"
+            conf_bonus = {"high": 5, "medium": 2, "low": 0}.get(conf, 0)
+            pos_bonus = 3 if my_pos and (other.get("part_of_speech") or "") == my_pos else 0
+            score = weight + conf_bonus + pos_bonus
+            # Prefer same group specificity stack: more shared tags later
+            note = f"same theme: {label}"
+            if spec == "lemma":
+                note = f"related meaning: {label}"
+            elif spec == "meta":
+                note = f"same marker: {label}"
+            prev = scored.get(oid)
+            if not prev or score > prev[0]:
+                scored[oid] = (score, note, other)
+
+    # Boost entries that share multiple of our tags
+    my_tag_ids = {h["tag_id"] for h in usable}
+    for oid, (score, note, other) in list(scored.items()):
+        other_tags = {h["tag_id"] for h in (by_entry.get(oid) or [])}
+        shared = len(my_tag_ids & other_tags)
+        if shared > 1:
+            scored[oid] = (score + shared * 8, note + f" (+{shared - 1} more)", other)
+
+    ranked = sorted(scored.values(), key=lambda x: (-x[0], x[2].get("headword", "").lower()))
+    return [(other, note) for _score, note, other in ranked[:limit]]
+
+
 def lab_url(form: str, prefix: str = "../") -> str:
     return f"{prefix}lab/index.html?q={quote(norm_form(form), safe='')}"
 
@@ -366,9 +448,11 @@ def build_related_panel(
     hw_index: dict[str, str],
     entries: dict,
     by_letter: dict[str, list],
+    semantic_index: dict | None = None,
 ) -> str:
     hw = entry.get("headword", "")
     sections: list[str] = []
+    listed_ids: set[str] = set()
 
     example_items: list[str] = []
     synonym_items: list[str] = []
@@ -380,6 +464,7 @@ def build_related_panel(
         if kind == "synonym" and form:
             target = resolve_entry(form, hw_index, entries)
             if target and target["id"] != entry["id"]:
+                listed_ids.add(target["id"])
                 synonym_items.append(related_entry_row(target, "listed as synonym", "../"))
             else:
                 synonym_items.append(f"""<li class="related-item">
@@ -428,6 +513,8 @@ def build_related_panel(
 
     neighbors = find_neighbors(entry, by_letter)
     if neighbors:
+        for other, _reason in neighbors:
+            listed_ids.add(other["id"])
         neighbor_items = "".join(
             related_entry_row(other, reason, "../") for other, reason in neighbors
         )
@@ -436,6 +523,40 @@ def build_related_panel(
         <h3>Similar headwords nearby</h3>
         <p class="related-hint">Same browse section — shared pieces or close spelling.</p>
         <ul class="related-list">{neighbor_items}</ul>
+      </div>""")
+
+    meaning_neighbors = find_semantic_neighbors(
+        entry, entries, semantic_index, exclude_ids=listed_ids, limit=6
+    )
+    if meaning_neighbors:
+        # Theme chips for this entry
+        my_tags = (semantic_index or {}).get("by_entry", {}).get(entry["id"]) or []
+        chips = ""
+        if my_tags:
+            chip_html = []
+            seen_t = set()
+            for h in my_tags:
+                tid = h["tag_id"]
+                if tid in seen_t or tid == "species":
+                    continue
+                seen_t.add(tid)
+                chip_html.append(
+                    f'<a class="theme-chip" href="../lab/index.html?theme={quote(tid, safe="")}">'
+                    f'{esc(h.get("label") or tid)}</a>'
+                )
+                if len(chip_html) >= 8:
+                    break
+            if chip_html:
+                chips = f'<p class="theme-chips">Themes: {" ".join(chip_html)}</p>'
+        meaning_items = "".join(
+            related_entry_row(other, reason, "../") for other, reason in meaning_neighbors
+        )
+        sections.append(f"""
+      <div class="related-group related-meaning">
+        <h3>Related by meaning <span class="badge badge-lab">Lab</span></h3>
+        <p class="related-hint">Shared themes mined from English glosses (animals, objects, body, nature, …) — not official categories. Verify with audio.</p>
+        {chips}
+        <ul class="related-list">{meaning_items}</ul>
       </div>""")
 
     if not sections:
@@ -450,7 +571,7 @@ def build_related_panel(
     <section class="lab-panel entry-lab-panel">
       <p class="badge-row">{badge_lab()}</p>
       <h2>Related forms</h2>
-      <p class="lab-hint">Pulled from this entry's examples and nearby headwords — verify with audio and speakers.</p>
+      <p class="lab-hint">Pulled from this entry's examples, nearby headwords, and English-theme tags — verify with audio and speakers.</p>
       {"".join(sections)}
     </section>"""
 
@@ -461,6 +582,7 @@ def build_entry_page(
     hw_index: dict[str, str],
     entries: dict,
     by_letter: dict[str, list],
+    semantic_index: dict | None = None,
 ) -> str:
     hw = entry.get("headword", "")
     pos_parts = [p for p in [entry.get("part_of_speech"), entry.get("sub_part_of_speech")] if p]
@@ -506,7 +628,7 @@ def build_entry_page(
       {examples_section}
       <p class="source-link"><a href="{esc(entry.get('source_url', ''))}" target="_blank" rel="noopener">View on penobscot-dictionary.appspot.com</a></p>
     </article>
-    {build_related_panel(entry, hw_index=hw_index, entries=entries, by_letter=by_letter)}"""
+    {build_related_panel(entry, hw_index=hw_index, entries=entries, by_letter=by_letter, semantic_index=semantic_index)}"""
     scripts = """
     <script src="../assets/audio-player.js"></script>
     <script>PenobscotAudio.initPage();</script>"""
@@ -654,10 +776,11 @@ def build_about_page(meta: dict) -> str:
       <ul>
         <li><strong>English → possible Penobscot</strong> — type normal English; the Lab matches dictionary definitions and suggests forms (with reasoning).</li>
         <li><strong>Penobscot → possible meaning</strong> — type a form you heard (plain letters OK); shows meaning first, then prefix/stem guesses.</li>
+        <li><strong>Themes</strong> — browse words tagged from English glosses (animals, body, objects, nature, food, …). Tags boost related Lab matches.</li>
         <li><strong>Perspective &amp; kinship</strong> — browse by mother, father, child, my/his/her, older/younger, feminine endings, etc., with pattern hints.</li>
       </ul>
-      <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel; <strong>Search</strong> shows amber
-      <strong>partial matches</strong> when you type a fragment of a word.</p>
+      <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel (including <strong>Related by meaning</strong> from theme tags);
+      <strong>Search</strong> shows amber <strong>partial matches</strong> when you type a fragment of a word.</p>
       <p>Always verify with audio and fluent speakers before trusting a Lab result.</p>
       <p><a href="lab/index.html" class="btn-lab-cta">Open Lab</a></p>
     </section>
@@ -685,6 +808,7 @@ python scripts/normalize_audio.py # restore comfortable listening level
 python scripts/build_site.py      # if you changed scripts only</pre>
       <p>Rebuild Lab pattern indexes only (no crawl):</p>
       <pre class="code-block">python scripts/mine_affixes.py
+python scripts/mine_semantic_tags.py
 python scripts/mine_kinship.py
 python scripts/build_site.py</pre>
       <p>Originals before normalization are kept in <code>audio_original/</code> (local backup, not required for serving).</p>
@@ -714,6 +838,14 @@ def build_lab_page() -> str:
       <div id="guesser-results" class="guesser-results"></div>
     </section>
 
+    <section class="lab-panel themes-panel">
+      <h2>Themes (from English glosses)</h2>
+      <p class="muted">Experimental tags mined from dictionary English — animals, body, objects, nature, food, motion, and more.
+      Not speaker categories. Use to browse related words; always verify with audio.</p>
+      <div id="theme-cats" class="kinship-cats"></div>
+      <div id="theme-results" class="kinship-results"></div>
+    </section>
+
     <section class="lab-panel kinship-panel">
       <h2>Perspective &amp; kinship</h2>
       <p class="muted">Browse by relationship, possession (my/his/her), age (older/younger), or word endings. Each entry shows <strong>pattern hints</strong> — guesses about which parts of the word may carry that meaning.</p>
@@ -733,6 +865,7 @@ def build_lab_page() -> str:
     </section>
     <script src="../assets/audio-player.js"></script>
     <script src="../assets/lab-guesser.js"></script>
+    <script src="../assets/semantic-tags.js"></script>
     <script src="../assets/kinship.js"></script>"""
     return page_shell("Lab", body, active="lab", asset_prefix="../", body_class="lab-page")
 
@@ -1223,6 +1356,7 @@ AUDIO_PLAYER_JS = textwrap.dedent("""\
 
 LAB_GUESSER_JS = (Path(__file__).parent / "lab_guesser.js").read_text(encoding="utf-8")
 KINSHIP_JS = (Path(__file__).parent / "kinship.js").read_text(encoding="utf-8")
+SEMANTIC_TAGS_JS = (Path(__file__).parent / "semantic_tags.js").read_text(encoding="utf-8")
 
 STYLE_CSS = textwrap.dedent("""\
     :root {
@@ -1319,6 +1453,20 @@ STYLE_CSS = textwrap.dedent("""\
     .kinship-pos { font-size: 0.85rem; color: var(--muted); font-style: italic; }
     .kinship-morph { margin-top: 0.5rem; }
     .kinship-card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px solid var(--lab-border); }
+    .themes-panel { margin-top: 1.5rem; }
+    .theme-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0.75rem; align-items: center; }
+    .theme-chip {
+      display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem;
+      background: var(--lab-bg); border: 1px solid var(--lab-border); color: var(--lab-accent);
+      text-decoration: none;
+    }
+    .theme-chip:hover { border-color: var(--lab-accent); background: #faf0d8; }
+    .related-meaning .badge-lab { font-size: 0.7rem; vertical-align: middle; }
+    .tag-chips { margin: 0.35rem 0 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .tag-chip {
+      font-size: 0.75rem; padding: 0.12rem 0.5rem; border-radius: 999px;
+      background: var(--lab-bg); border: 1px solid var(--lab-border); color: var(--muted);
+    }
     .breakdown-card { background: var(--surface); border: 1px solid var(--lab-border); border-left: 4px solid var(--lab-accent); border-radius: var(--radius); padding: 1.1rem 1.25rem; }
     .breakdown-title { color: var(--lab-accent); font-size: 1.05rem; margin-bottom: 0.5rem; }
     .breakdown-query { font-family: var(--font-word); font-size: 1.35rem; font-weight: 600; color: var(--lab-accent); margin-bottom: 0.75rem; }
@@ -1494,6 +1642,8 @@ def main() -> int:
     scripts_dir = Path(__file__).parent
     print("Mining Lab affix patterns...")
     subprocess.run([sys.executable, str(scripts_dir / "mine_affixes.py")], check=True)
+    print("Mining semantic theme tags...")
+    subprocess.run([sys.executable, str(scripts_dir / "mine_semantic_tags.py")], check=True)
     print("Mining kinship/perspective index...")
     subprocess.run([sys.executable, str(scripts_dir / "mine_kinship.py")], check=True)
 
@@ -1513,10 +1663,13 @@ def main() -> int:
         (SENTENCE_EXAMPLES_JSON, "sentence-examples.json"),
         (ENGLISH_INDEX_JSON, "english-index.json"),
         (KINSHIP_INDEX_JSON, "kinship-index.json"),
+        (SEMANTIC_TAGS_JSON, "semantic-tags.json"),
     ]
     for src, name in lab_assets:
         if src.exists():
             save_json(assets / name, load_json(src))
+
+    semantic_index = load_json(SEMANTIC_TAGS_JSON, {}) if SEMANTIC_TAGS_JSON.exists() else {}
 
     by_letter: dict[str, list] = {}
     for entry in entries.values():
@@ -1528,7 +1681,13 @@ def main() -> int:
     print("Building entry pages...")
     for eid, entry in entries.items():
         (entry_dir / f"{eid}.html").write_text(
-            build_entry_page(entry, hw_index=hw_index, entries=entries, by_letter=by_letter),
+            build_entry_page(
+                entry,
+                hw_index=hw_index,
+                entries=entries,
+                by_letter=by_letter,
+                semantic_index=semantic_index,
+            ),
             encoding="utf-8",
         )
 
@@ -1546,6 +1705,7 @@ def main() -> int:
     (assets / "audio-player.js").write_text(AUDIO_PLAYER_JS, encoding="utf-8")
     (assets / "lab-guesser.js").write_text(LAB_GUESSER_JS, encoding="utf-8")
     (assets / "kinship.js").write_text(KINSHIP_JS, encoding="utf-8")
+    (assets / "semantic-tags.js").write_text(SEMANTIC_TAGS_JS, encoding="utf-8")
     (assets / "pos-tooltips.js").write_text(build_tooltips_js(), encoding="utf-8")
 
     search_docs = build_search_index(entries)

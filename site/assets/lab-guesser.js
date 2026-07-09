@@ -3,6 +3,8 @@ let prefixes = [];
 let baseWords = [];
 let sentences = [];
 let englishIndex = [];
+/** @type {{tags?: Array, keywordToTags?: Map}} */
+let semanticCatalog = { tags: [], keywordToTags: new Map() };
 
 const STOP_WORDS = new Set([
   'the', 'and', 'for', 'are', 'was', 'were', 'with', 'that', 'this', 'from', 'has', 'have',
@@ -163,7 +165,65 @@ function buildPrefixReasoning(formRec, person) {
   return steps;
 }
 
-function scoreEnglishEntry(entry, tokens) {
+function buildKeywordTagMap(tags) {
+  const map = new Map();
+  for (const t of tags || []) {
+    for (const kw of (t.keywords || [])) {
+      const k = kw.toLowerCase();
+      if (!map.has(k)) map.set(k, []);
+      map.get(k).push(t);
+    }
+  }
+  return map;
+}
+
+/** Infer theme tags from an English query via keyword map. */
+function tagsFromQuery(query, tokens) {
+  const found = new Map(); // tag_id -> tag meta
+  const words = new Set(tokens.map(t => t.toLowerCase()));
+  // also split full query for short keywords
+  for (const w of query.toLowerCase().replace(/[^a-z'\s]/g, ' ').split(/\s+/)) {
+    if (w.length >= 3) words.add(w);
+  }
+  for (const w of words) {
+    const hits = semanticCatalog.keywordToTags.get(w) || [];
+    for (const t of hits) {
+      if (!found.has(t.id)) found.set(t.id, t);
+    }
+  }
+  return [...found.values()];
+}
+
+function tagBonus(queryTags, entryTags, entryTagMeta) {
+  if (!queryTags.length || !entryTags || !entryTags.length) return { bonus: 0, shared: [] };
+  const entrySet = new Set(entryTags);
+  const metaById = {};
+  for (const m of (entryTagMeta || [])) metaById[m.id] = m;
+
+  let bonus = 0;
+  const shared = [];
+  for (const qt of queryTags) {
+    if (!entrySet.has(qt.id)) continue;
+    const spec = qt.specificity || (metaById[qt.id] && metaById[qt.id].specificity) || 'theme';
+    if (spec === 'lemma') bonus += 4;
+    else if (spec === 'meta') bonus += 2;
+    else bonus += 2;
+    shared.push(qt);
+  }
+  // Same group without exact tag: small nudge
+  if (!shared.length && queryTags.length) {
+    const entryGroups = new Set((entryTagMeta || []).map(m => m.group));
+    for (const qt of queryTags) {
+      if (entryGroups.has(qt.group)) {
+        bonus += 1;
+        break;
+      }
+    }
+  }
+  return { bonus: Math.min(bonus, 12), shared };
+}
+
+function scoreEnglishEntry(entry, tokens, queryTags) {
   let score = 0;
   const matched = [];
   const enLow = entry.english.toLowerCase();
@@ -176,9 +236,13 @@ function scoreEnglishEntry(entry, tokens) {
       matched.push(t);
     }
   }
-  if (!score) return null;
+  const { bonus, shared } = tagBonus(queryTags || [], entry.tags || [], entry.tag_meta || []);
+  score += bonus;
+  // Allow pure tag matches when tokens miss (e.g. query "moose" tags lemma)
+  if (!matched.length && !bonus) return null;
+  if (!matched.length && bonus && !score) score = bonus;
   const coverage = matched.length / Math.max(tokens.length, 1);
-  return { entry, score, matched, coverage };
+  return { entry, score, matched, coverage, tagBonus: bonus, sharedTags: shared };
 }
 
 function matchArchiveSentences(query, tokens) {
@@ -198,25 +262,34 @@ function matchArchiveSentences(query, tokens) {
 function detectFromEnglish(query) {
   const tokens = tokenizeEnglish(query);
   const person = detectPerson(query);
-  if (!tokens.length && !person) return { query, suggestions: [], sentenceHits: [], person, tokens };
+  const queryTags = tagsFromQuery(query, tokens);
+  if (!tokens.length && !person && !queryTags.length) {
+    return { query, suggestions: [], sentenceHits: [], person, tokens, queryTags: [] };
+  }
 
   const scored = [];
   for (const entry of englishIndex) {
-    const hit = scoreEnglishEntry(entry, tokens);
+    const hit = scoreEnglishEntry(entry, tokens, queryTags);
     if (hit) scored.push(hit);
   }
-  scored.sort((a, b) => b.score - a.score || b.coverage - a.coverage);
+  scored.sort((a, b) => b.score - a.score || (b.tagBonus || 0) - (a.tagBonus || 0) || b.coverage - a.coverage);
 
   const suggestions = [];
   const seen = new Set();
-  for (const { entry, score, matched, coverage } of scored.slice(0, 8)) {
+  for (const { entry, score, matched, coverage, tagBonus: tb, sharedTags } of scored.slice(0, 12)) {
     if (seen.has(entry.entry_id)) continue;
     seen.add(entry.entry_id);
     const picked = pickConjugatedForm(entry.entry_id, person);
     if (!picked) continue;
 
     const reasoning = [];
-    reasoning.push(`Matched dictionary entry <a href="../entry/${entry.entry_id}.html">${escapeHtml(entry.headword)}</a> — “${escapeHtml(entry.english)}” (your words: ${matched.map(escapeHtml).join(', ')})`);
+    const wordPart = matched.length
+      ? `your words: ${matched.map(escapeHtml).join(', ')}`
+      : 'theme tags only';
+    reasoning.push(`Matched dictionary entry <a href="../entry/${entry.entry_id}.html">${escapeHtml(entry.headword)}</a> — “${escapeHtml(entry.english)}” (${wordPart})`);
+    if (sharedTags && sharedTags.length) {
+      reasoning.push(`Shared themes: ${sharedTags.map(t => escapeHtml(t.label || t.id)).join(', ')} (+${tb} score from tags)`);
+    }
     if (person) {
       reasoning.push(`You wrote “${escapeHtml(person.label)}” — searching archive examples for that person`);
       reasoning.push(...buildPrefixReasoning(picked.form, person));
@@ -234,6 +307,7 @@ function detectFromEnglish(query) {
       headword: entry.headword,
       archiveEnglish: entry.english,
       matchedWords: matched,
+      sharedTags: sharedTags || [],
       person,
       reasoning,
       confidence: conf,
@@ -244,7 +318,7 @@ function detectFromEnglish(query) {
   }
 
   const sentenceHits = matchArchiveSentences(query, tokens);
-  return { query, tokens, person, suggestions, sentenceHits };
+  return { query, tokens, person, suggestions, sentenceHits, queryTags };
 }
 
 function findStemMatch(stem) {
@@ -391,7 +465,16 @@ function renderEnglishDetection(det) {
     html += '</div>';
   }
 
+  if (det.queryTags && det.queryTags.length) {
+    html += `<p class="tag-chips"><span class="muted">Detected themes:</span> ${
+      det.queryTags.map(t => `<span class="tag-chip">${escapeHtml(t.label || t.id)}</span>`).join('')
+    }</p>`;
+  }
+
   for (const sug of det.suggestions.slice(0, 4)) {
+    const tagChips = (sug.sharedTags && sug.sharedTags.length)
+      ? `<p class="tag-chips">${sug.sharedTags.map(t => `<span class="tag-chip">${escapeHtml(t.label || t.id)}</span>`).join('')}</p>`
+      : '';
     html += `
       <div class="breakdown-card confidence-${sug.confidence}">
         <h3 class="breakdown-title">Possible Penobscot</h3>
@@ -400,6 +483,7 @@ function renderEnglishDetection(det) {
           <span class="breakdown-label">What we think you meant</span>
           <p class="breakdown-meaning-text">${escapeHtml(det.query)}</p>
           <p class="breakdown-meta">Built from archive entry: “${escapeHtml(sug.archiveEnglish)}”</p>
+          ${tagChips}
         </div>
         <div class="breakdown-reasoning">
           <span class="breakdown-label">Why the system chose this</span>
@@ -680,18 +764,26 @@ function setModeLabel(mode) {
 }
 
 async function init() {
-  const [formsResp, affixResp, baseResp, sentResp, enResp] = await Promise.all([
+  const [formsResp, affixResp, baseResp, sentResp, enResp, tagsResp] = await Promise.all([
     fetch('../assets/guesser-forms.json'),
     fetch('../assets/affix-patterns.json'),
     fetch('../assets/base-words.json'),
     fetch('../assets/sentence-examples.json'),
     fetch('../assets/english-index.json'),
+    fetch('../assets/semantic-tags.json').catch(() => null),
   ]);
   forms = (await formsResp.json()).forms || [];
   prefixes = (await affixResp.json()).prefixes || [];
   baseWords = (await baseResp.json()).words || [];
   sentences = (await sentResp.json()).sentences || [];
   englishIndex = (await enResp.json()).entries || [];
+  if (tagsResp && tagsResp.ok) {
+    try {
+      const tagData = await tagsResp.json();
+      semanticCatalog.tags = tagData.tags || [];
+      semanticCatalog.keywordToTags = buildKeywordTagMap(semanticCatalog.tags);
+    } catch (_) { /* optional */ }
+  }
 
   const form = document.getElementById('guesser-form');
   const input = document.getElementById('guesser-q');

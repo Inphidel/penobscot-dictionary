@@ -92,6 +92,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
 .kinship-pos { font-size: 0.85rem; color: var(--muted); font-style: italic; }
 .kinship-morph { margin-top: 0.5rem; }
 .kinship-card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px solid var(--lab-border); }
+.themes-panel { margin-top: 1.5rem; }
+.theme-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0.75rem; align-items: center; }
+.theme-chip {
+  display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem;
+  background: var(--lab-bg); border: 1px solid var(--lab-border); color: var(--lab-accent);
+  text-decoration: none;
+}
+.theme-chip:hover { border-color: var(--lab-accent); background: #faf0d8; }
+.related-meaning .badge-lab { font-size: 0.7rem; vertical-align: middle; }
+.tag-chips { margin: 0.35rem 0 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.tag-chip {
+  font-size: 0.75rem; padding: 0.12rem 0.5rem; border-radius: 999px;
+  background: var(--lab-bg); border: 1px solid var(--lab-border); color: var(--muted);
+}
 .breakdown-card { background: var(--surface); border: 1px solid var(--lab-border); border-left: 4px solid var(--lab-accent); border-radius: var(--radius); padding: 1.1rem 1.25rem; }
 .breakdown-title { color: var(--lab-accent); font-size: 1.05rem; margin-bottom: 0.5rem; }
 .breakdown-query { font-family: var(--font-word); font-size: 1.35rem; font-weight: 600; color: var(--lab-accent); margin-bottom: 0.75rem; }

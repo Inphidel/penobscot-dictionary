@@ -43,10 +43,11 @@
       <ul>
         <li><strong>English → possible Penobscot</strong> — type normal English; the Lab matches dictionary definitions and suggests forms (with reasoning).</li>
         <li><strong>Penobscot → possible meaning</strong> — type a form you heard (plain letters OK); shows meaning first, then prefix/stem guesses.</li>
+        <li><strong>Themes</strong> — browse words tagged from English glosses (animals, body, objects, nature, food, …). Tags boost related Lab matches.</li>
         <li><strong>Perspective &amp; kinship</strong> — browse by mother, father, child, my/his/her, older/younger, feminine endings, etc., with pattern hints.</li>
       </ul>
-      <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel; <strong>Search</strong> shows amber
-      <strong>partial matches</strong> when you type a fragment of a word.</p>
+      <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel (including <strong>Related by meaning</strong> from theme tags);
+      <strong>Search</strong> shows amber <strong>partial matches</strong> when you type a fragment of a word.</p>
       <p>Always verify with audio and fluent speakers before trusting a Lab result.</p>
       <p><a href="lab/index.html" class="btn-lab-cta">Open Lab</a></p>
     </section>
@@ -74,6 +75,7 @@ python scripts/normalize_audio.py # restore comfortable listening level
 python scripts/build_site.py      # if you changed scripts only</pre>
       <p>Rebuild Lab pattern indexes only (no crawl):</p>
       <pre class="code-block">python scripts/mine_affixes.py
+python scripts/mine_semantic_tags.py
 python scripts/mine_kinship.py
 python scripts/build_site.py</pre>
       <p>Originals before normalization are kept in <code>audio_original/</code> (local backup, not required for serving).</p>

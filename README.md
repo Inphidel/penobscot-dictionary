@@ -79,7 +79,7 @@ python scripts/normalize_audio.py # required after crawl — restore ~-15 LUFS
 
 - **Search** — Penobscot or English; partial Penobscot fragments show amber Lab matches
 - **Browse** — by sound/letter (a, č, kʷ, root, …)
-- **Lab** — English → possible Penobscot; Penobscot → meaning; kinship/perspective browse
+- **Lab** — English → possible Penobscot; Penobscot → meaning; **Themes** (animals, body, objects, …) and kinship/perspective browse
 - **Audio** — play, loop, save recordings on entry and search results
 - **POS labels** — hover abbreviations (AI, INAN, Initial, …) for explanations
 
@@ -89,9 +89,12 @@ Archive pages (green) are official dictionary copies. Lab pages (amber) are **ex
 
 ```bash
 python scripts/mine_affixes.py
+python scripts/mine_semantic_tags.py   # English-gloss theme tags for related meaning
 python scripts/mine_kinship.py
 python scripts/build_site.py
 ```
+
+`build_site.py` runs all three miners automatically. Theme tags power Lab browse, English match boosts, and entry-page **Related by meaning**.
 
 ## Audio loudness (optional)
 

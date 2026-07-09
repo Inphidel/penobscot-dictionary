@@ -32,6 +32,7 @@ BASE_WORDS_JSON = LAB_DATA_DIR / "base_words.json"
 SENTENCE_EXAMPLES_JSON = LAB_DATA_DIR / "sentence_examples.json"
 ENGLISH_INDEX_JSON = LAB_DATA_DIR / "english_index.json"
 KINSHIP_INDEX_JSON = LAB_DATA_DIR / "kinship_index.json"
+SEMANTIC_TAGS_JSON = LAB_DATA_DIR / "semantic_tags.json"
 
 _FOLD_TRANSLATE = str.maketrans({
     "č": "c", "Č": "c",
