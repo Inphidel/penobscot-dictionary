@@ -35,6 +35,11 @@ GROUPS = [
     {"id": "objects", "label": "Objects & tools", "description": "Tools, craft items, dwellings, boats"},
     {"id": "food", "label": "Food & cooking", "description": "Food, cooking, hunger, drink"},
     {"id": "people", "label": "People & social", "description": "People, roles, health, life and death"},
+    {
+        "id": "survival",
+        "label": "Survival & action",
+        "description": "Hide, find, track, hurt, defend, flee, pretend — life-skill / root-meaning clusters",
+    },
     {"id": "motion", "label": "Motion & posture", "description": "Movement, posture, carrying"},
     {"id": "perception", "label": "Perception & speech", "description": "Sensing, thinking, speaking, arts"},
     {"id": "meta", "label": "Dictionary markers", "description": "Structural gloss markers (species names, place names)"},
@@ -43,7 +48,8 @@ GROUPS = [
 
 def _lemma(tag_id: str, label: str, group: str, words: list[str], *, parent: str | None = None,
            extra_patterns: list[str] | None = None, exclude: list[str] | None = None,
-           confidence: str = "medium") -> dict:
+           headword_patterns: list[str] | None = None,
+           confidence: str = "medium", description: str | None = None) -> dict:
     """Build a lemma tag from whole-word keywords plus optional extra patterns."""
     pats = [rf"\b{re.escape(w)}\b" for w in words]
     if extra_patterns:
@@ -54,9 +60,10 @@ def _lemma(tag_id: str, label: str, group: str, words: list[str], *, parent: str
         "group": group,
         "specificity": "lemma",
         "parent": parent,
-        "description": f"Glosses that mention {label.lower()}",
+        "description": description or f"Glosses that mention {label.lower()}",
         "english_patterns": pats,
         "exclude_patterns": exclude or [],
+        "headword_patterns": headword_patterns or [],
         "keywords": words,
         "confidence": confidence,
     }
@@ -64,6 +71,7 @@ def _lemma(tag_id: str, label: str, group: str, words: list[str], *, parent: str
 
 def _theme(tag_id: str, label: str, group: str, patterns: list[str], *,
            keywords: list[str] | None = None, exclude: list[str] | None = None,
+           headword_patterns: list[str] | None = None,
            confidence: str = "medium", description: str | None = None) -> dict:
     return {
         "id": tag_id,
@@ -74,12 +82,14 @@ def _theme(tag_id: str, label: str, group: str, patterns: list[str], *,
         "description": description or f"Theme: {label.lower()}",
         "english_patterns": patterns,
         "exclude_patterns": exclude or [],
+        "headword_patterns": headword_patterns or [],
         "keywords": keywords or [],
         "confidence": confidence,
     }
 
 
 def _meta(tag_id: str, label: str, patterns: list[str], *, keywords: list[str] | None = None,
+          headword_patterns: list[str] | None = None,
           description: str | None = None) -> dict:
     return {
         "id": tag_id,
@@ -90,6 +100,7 @@ def _meta(tag_id: str, label: str, patterns: list[str], *, keywords: list[str] |
         "description": description or label,
         "english_patterns": patterns,
         "exclude_patterns": [],
+        "headword_patterns": headword_patterns or [],
         "keywords": keywords or [],
         "confidence": "high",
     }
@@ -379,11 +390,252 @@ TAGS: list[dict] = [
     _theme(
         "hunt",
         "Hunt / game",
-        "people",
+        "survival",
         [r"\bhunt\b", r"\bhunting\b", r"\bhunter\b", r"\bhunted\b", r"\bgame\b", r"\bprey\b", r"\bstalk\b"],
-        keywords=["hunt", "hunting", "hunter", "game", "prey"],
-        exclude=[r"\bgame\s+(of|with)\b", r"\bvideo\s+game\b"],
+        keywords=["hunt", "hunting", "hunter", "game", "prey", "stalk"],
+        exclude=[r"\bgame\s+(of|with)\b", r"\bvideo\s+game\b", r"\blacrosse\b", r"\bdish game\b", r"\bgames of chance\b"],
         description="Hunting and game animals as quarry",
+    ),
+
+    # --- Survival & action (root-meaning / life-skill clusters) ---
+    _theme(
+        "hide",
+        "Hide / conceal",
+        "survival",
+        [
+            r"\bhide[s]?\b", r"\bhiding\b", r"\bhidden\b",
+            r"\bconceal\b", r"\bconceals\b", r"\bconcealed\b", r"\bconcealment\b",
+            r"\bfurtive\b", r"\bsneak\b", r"\bsneaks\b", r"\bsneaking\b",
+            r"\bsecret\b", r"\bdisappear\b", r"\bdisappears\b",
+            r"\bhides himself\b", r"\bhides away\b", r"\bwithdraws behind\b",
+        ],
+        keywords=["hide", "hides", "hiding", "hidden", "conceal", "furtive", "sneak", "secret", "disappear"],
+        exclude=[
+            r"\bhide\s+(stretcher|tanning|for tanning|scraper)\b",
+            r"\bhides?\s+(for tanning|and leather|or leather|fabric)\b",
+            r"\bhandles fabric, hides\b",
+            r"\bprepares hides\b",
+            r"\bwash(es)? (clothes, )?hides\b",
+            r"\bhide scraper\b",
+            r"\bfabric,?\s*hide\b",
+            r"\bdirty fabric, hide\b",
+            r"\bstretch hides\b",
+            r"\btanning\b",
+        ],
+        headword_patterns=[
+            r"\|kα-\|",  # hide root as headword
+            r"^kὰləso", r"^kαtso", r"^kὰtso", r"kʷάsohke", r"kʷαsohke",
+        ],
+        description="Hiding, concealing, furtive action (not animal hide/skin as material)",
+        confidence="high",
+    ),
+    _theme(
+        "find",
+        "Find / search",
+        "survival",
+        [
+            r"\bfind\b", r"\bfinds\b", r"\bfinding\b", r"\bfound\b",
+            r"\bsearch\b", r"\bsearches\b", r"\bsearching\b",
+            r"\bseek\b", r"\bseeks\b", r"\bseeking\b", r"\bsought\b",
+            r"\bdiscover\b", r"\bdiscovers\b", r"\bdiscovered\b",
+            r"\blocate\b", r"\blocates\b", r"\blocated\b",
+            r"\blook for\b", r"\blooking for\b", r"\blooks for\b",
+        ],
+        keywords=["find", "finds", "found", "search", "searches", "seek", "discover", "locate"],
+        exclude=[r"\bfound\s+(ation|er|ry)\b", r"\bprofound\b"],
+        description="Finding, searching, seeking, locating",
+    ),
+    _theme(
+        "track",
+        "Track / trail",
+        "survival",
+        [
+            r"\btrack\b", r"\btracks\b", r"\btracking\b", r"\btracked\b",
+            r"\btrail\b", r"\btrails\b", r"\bfootprint\b", r"\bfootprints\b",
+            r"\bspoor\b", r"\bscent\b(?!\s+gland)", r"\bfollow\b", r"\bfollows\b", r"\bfollowing\b",
+        ],
+        keywords=["track", "tracks", "tracking", "trail", "trails", "footprint", "follow", "scent"],
+        exclude=[r"\bfollow\s+(suit|through|up)\b", r"\btrail\s+off\b"],
+        description="Tracking, trails, following sign",
+    ),
+    _theme(
+        "location",
+        "Place / direction",
+        "survival",
+        [
+            r"\bplace\b", r"\bplaces\b", r"\blocation\b", r"\blocale\b",
+            r"\bdirection\b", r"\btoward\b", r"\btowards\b", r"\byonder\b",
+            r"\bbeyond\b", r"\bbehind\b", r"\bbeside\b", r"\bnearby\b",
+            r"\bpath\b", r"\bpaths\b", r"\broad\b", r"\broads\b",
+            r"\bwhere\b", r"\bwhence\b", r"\bthither\b",
+            r"\bin that direction\b", r"\bin this direction\b",
+            r"\bportage\b", r"\bcamping place\b", r"\bdwelling place\b",
+        ],
+        keywords=["place", "location", "locale", "direction", "toward", "path", "trail", "yonder", "beyond", "portage"],
+        exclude=[r"\bplace\s+(the|his|her|my|a\s+hand|in\s+order)\b", r"\btakes place\b"],
+        description="Places, paths, and directional location (not every use of 'there')",
+    ),
+    _theme(
+        "hurt",
+        "Hurt / injury",
+        "survival",
+        [
+            r"\bhurt\b", r"\bhurts\b", r"\bhurting\b",
+            r"\binjure\b", r"\binjures\b", r"\binjured\b", r"\binjury\b",
+            r"\bwound\b", r"\bwounds\b", r"\bwounded\b",
+            r"\bpain\b", r"\bpainful\b", r"\bache\b", r"\baches\b", r"\baking\b",
+            r"\bbruise\b", r"\bbruises\b", r"\bbruised\b",
+            r"\bbleed\b", r"\bbleeds\b", r"\bbleeding\b", r"\bbloody\b",
+            r"\bburn\b", r"\bburns\b", r"\bburned\b", r"\bburning\b(?!\s+with\s+desire)",
+            r"\bcut\b", r"\bcuts\b", r"\bcutting\b",
+            r"\bbreak[s]?\s+(his|her|a|the|one's|own)\b", r"\bbroken\s+(leg|arm|bone|head|back|neck)\b",
+            r"\bstrike[s]?\b", r"\bstruck\b", r"\bhit[s]?\b(?!\s+upon)",
+        ],
+        keywords=["hurt", "injury", "wound", "wounded", "pain", "ache", "bruise", "bleed", "burn", "cut"],
+        exclude=[
+            r"\bcut\s+(off|down|through|across|short)\b",
+            r"\bbreak[s]?\s+(camp|down|into|up|away|off|open|news)\b",
+            r"\bstrike\s+(out|up|a\s+bargain|camp)\b",
+        ],
+        description="Injury, pain, wounds, blows",
+    ),
+    _theme(
+        "defend",
+        "Defend / protect",
+        "survival",
+        [
+            r"\bdefend\b", r"\bdefends\b", r"\bdefending\b", r"\bdefense\b", r"\bdefence\b",
+            r"\bprotect\b", r"\bprotects\b", r"\bprotecting\b", r"\bprotection\b",
+            r"\bguard\b", r"\bguards\b", r"\bguarding\b",
+            r"\bshield\b", r"\bward\s+off\b", r"\bfight back\b", r"\bdefend himself\b",
+            r"\bresist\b", r"\bresists\b", r"\bresisting\b",
+        ],
+        keywords=["defend", "defense", "protect", "protection", "guard", "shield", "resist"],
+        description="Defending, protecting, resisting attack",
+        confidence="high",
+    ),
+    _theme(
+        "pretend",
+        "Pretend / mimic",
+        "survival",
+        [
+            r"\bpretend\b", r"\bpretends\b", r"\bpretending\b",
+            r"\bimitate\b", r"\bimitates\b", r"\bimitating\b", r"\bimitation\b",
+            r"\bmimic\b", r"\bmimics\b", r"\bmimicking\b",
+            r"\bfeign\b", r"\bfeigns\b", r"\bfeigning\b",
+            r"\bmake believe\b", r"\bmakes believe\b",
+            r"\bacts? like\b", r"\bbehaves? like\b",
+            r"\bemulates\b", r"\bemulate\b",
+            r"\bcalls? like\b", r"\bsounds? like a\b", r"\bsmells? like a\b",
+            r"\bplays raccoon\b", r"\bape[sd]?\b",
+        ],
+        keywords=[
+            "pretend", "pretends", "imitate", "mimic", "feign", "feigns",
+            "disguise", "emulate", "make believe",
+        ],
+        headword_patterns=[
+            r"kkαləso$",  # pretends-to-be construction
+            r"\|amahs-\|",  # imitate root
+        ],
+        description="Pretending, imitating, acting/calling/smelling like — mimicry cluster",
+        confidence="high",
+    ),
+    _theme(
+        "fear",
+        "Fear / danger",
+        "survival",
+        [
+            r"\bfear\b", r"\bfears\b", r"\bafraid\b",
+            r"\bfrighten\b", r"\bfrightens\b", r"\bfrightened\b", r"\bfright\b",
+            r"\bscare\b", r"\bscares\b", r"\bscared\b",
+            r"\bstartle\b", r"\bstartles\b", r"\bstartled\b",
+            r"\bdanger\b", r"\bdangerous\b", r"\bthreat\b", r"\bthreaten\b",
+            r"\balarm\b", r"\bterror\b", r"\bdread\b",
+        ],
+        keywords=["fear", "afraid", "frighten", "frightened", "scare", "startle", "danger", "threat", "alarm"],
+        description="Fear, startle, danger, threat",
+    ),
+    _theme(
+        "flee",
+        "Flee / escape",
+        "survival",
+        [
+            r"\bflee\b", r"\bflees\b", r"\bfled\b", r"\bfleeing\b", r"\bflight\b",
+            r"\bescape\b", r"\bescapes\b", r"\bescaped\b", r"\bescaping\b",
+            r"\brun away\b", r"\bruns away\b", r"\bflee from\b",
+            r"\bsurvive\b", r"\bsurvives\b", r"\bsurviving\b", r"\bsurvival\b",
+            r"\brescue\b", r"\brescues\b", r"\brescued\b",
+            r"\bsave\b", r"\bsaves\b", r"\bsaved\b(?!\s+money)",
+        ],
+        keywords=["flee", "flees", "escape", "escapes", "flight", "survive", "rescue", "save", "run away"],
+        exclude=[r"\bflight\s+of\s+(stairs|fancy)\b", r"\bsave\s+(money|time|face)\b"],
+        description="Fleeing, escaping, surviving, rescue",
+    ),
+    _theme(
+        "attack",
+        "Attack / strike",
+        "survival",
+        [
+            r"\battack\b", r"\battacks\b", r"\battacking\b",
+            r"\bstrike\b", r"\bstrikes\b", r"\bstruck\b",
+            r"\bwar\b", r"\bwarfare\b", r"\bwarrior\b",
+            r"\benemy\b", r"\benemies\b",
+            r"\bcaptive\b", r"\bcaptives\b", r"\bprisoner\b", r"\bprisoners\b",
+            r"\bsteal\b", r"\bsteals\b", r"\bstolen\b", r"\brob\b", r"\brobs\b",
+            r"\bforce\b", r"\bforces\b", r"\bforced\b",
+        ],
+        keywords=["attack", "strike", "war", "warfare", "enemy", "captive", "prisoner", "steal", "force"],
+        exclude=[
+            r"\bstrike\s+(out|up|a\s+bargain|camp|oil)\b",
+            r"\bforce\s+(of\s+habit|open)\b",
+            r"\bwar\s+(whoop|dance|paint)\b",  # keep paint/dance — actually keep those, they're war-related
+        ],
+        description="Attack, war, capture, force, theft",
+    ),
+    _theme(
+        "cover_shelter",
+        "Cover / shelter",
+        "survival",
+        [
+            r"\bcover\b", r"\bcovers\b", r"\bcovering\b", r"\bcovered\b",
+            r"\bshelter\b", r"\bshelters\b", r"\bsheltered\b",
+            r"\bblanket\b", r"\bblankets\b",
+            r"\bshade\b", r"\bshadow\b",
+            r"\bwrap\b", r"\bwraps\b", r"\bwrapped\b",
+        ],
+        keywords=["cover", "covers", "covering", "shelter", "shade", "shadow", "wrap"],
+        exclude=[r"\bcover\s+(charge|story|letter)\b", r"\bunder cover of\b"],
+        description="Covering, sheltering, wrapping for protection or concealment",
+    ),
+    _theme(
+        "trap_catch",
+        "Trap / catch",
+        "survival",
+        [
+            r"\btrap\b", r"\btraps\b", r"\btrapping\b", r"\btrapped\b",
+            r"\bsnare\b", r"\bsnares\b", r"\bsnared\b",
+            r"\bbait\b", r"\blure\b", r"\blures\b",
+            r"\bcatch\b", r"\bcatches\b", r"\bcatching\b", r"\bcaught\b",
+            r"\bquarry\b", r"\bweir\b",
+        ],
+        keywords=["trap", "traps", "snare", "bait", "lure", "catch", "catches", "caught", "quarry", "weir"],
+        exclude=[r"\bcatch\s+(cold|fire|up|on)\b", r"\btrap\s+door\b"],
+        description="Trapping, snaring, catching game or fish",
+    ),
+    _theme(
+        "gather",
+        "Gather / fetch",
+        "survival",
+        [
+            r"\bgather\b", r"\bgathers\b", r"\bgathering\b",
+            r"\bfetch\b", r"\bfetches\b", r"\bfetching\b",
+            r"\bcollect\b", r"\bcollects\b", r"\bcollecting\b",
+            r"\bpick\b", r"\bpicks\b", r"\bpicking\b",
+            r"\bharvest\b", r"\bharvests\b", r"\bharvesting\b",
+        ],
+        keywords=["gather", "gathering", "fetch", "collect", "pick", "picking", "harvest"],
+        exclude=[r"\bpick\s+(a\s+fight|up\s+speed|on)\b", r"\bpicks?\s+his\s+own\b"],
+        description="Gathering, fetching, harvesting resources",
     ),
 
     # --- Motion ---
@@ -443,14 +695,16 @@ def _ensure_compiled() -> list[dict]:
             **tag,
             "_include": [re.compile(p, re.I) for p in (tag.get("english_patterns") or [])],
             "_exclude": [re.compile(p, re.I) for p in (tag.get("exclude_patterns") or [])],
+            "_headword": [re.compile(p, re.I) for p in (tag.get("headword_patterns") or [])],
         })
     return _COMPILED
 
 
-def tag_matches(english: str, tag: dict) -> tuple[bool, str, str]:
-    """Return (matched, reason, confidence)."""
+def tag_matches(english: str, tag: dict, headword: str = "") -> tuple[bool, str, str]:
+    """Return (matched, reason, confidence). Matches English gloss and optional headword patterns."""
     en = english or ""
     en_low = en.lower()
+    hw = headword or ""
     for rx in tag.get("_exclude") or []:
         if rx.search(en_low):
             # v1: any exclude kills the tag (precision over recall).
@@ -461,6 +715,12 @@ def tag_matches(english: str, tag: dict) -> tuple[bool, str, str]:
         if rx.search(en):
             reason = f"English: {raw_pats[i] if i < len(raw_pats) else rx.pattern}"
             break
+    if not reason and hw:
+        raw_hw = tag.get("headword_patterns") or []
+        for i, rx in enumerate(tag.get("_headword") or []):
+            if rx.search(hw):
+                reason = f"Headword: {raw_hw[i] if i < len(raw_hw) else rx.pattern}"
+                break
     if not reason:
         return False, "", ""
     conf = tag.get("confidence") or "medium"
@@ -469,6 +729,9 @@ def tag_matches(english: str, tag: dict) -> tuple[bool, str, str]:
             conf = "high"
     if tag.get("specificity") == "meta":
         conf = "high"
+    # Morph cue alone is still useful but slightly softer unless English also hit
+    if reason.startswith("Headword:") and conf == "high":
+        conf = "medium"
     return True, reason, conf
 
 
@@ -505,8 +768,9 @@ def build_index(entries: dict) -> dict:
             "audio_alt": alt,
         }
 
+        hw = entry.get("headword", "")
         for tag in compiled:
-            ok, reason, conf = tag_matches(en, tag)
+            ok, reason, conf = tag_matches(en, tag, headword=hw)
             if not ok:
                 continue
             hit = {
