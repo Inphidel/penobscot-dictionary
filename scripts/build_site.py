@@ -21,6 +21,7 @@ from common import (
     GUESSER_FORMS_JSON,
     SENTENCE_EXAMPLES_JSON,
     SITE_DIR,
+    SITE_MIRROR_URL,
     ensure_dirs,
     fold_ascii,
     load_json,
@@ -87,6 +88,56 @@ def badge_lab() -> str:
     return '<span class="badge badge-lab">Experimental Lab — verify with audio &amp; speakers</span>'
 
 
+def truncate_og(text: str, max_len: int = 280) -> str:
+    text = " ".join((text or "").split())
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 1].rstrip() + "…"
+
+
+def entry_og_description(entry: dict) -> str:
+    parts: list[str] = []
+    english = (entry.get("english") or "").strip().rstrip(";")
+    if english:
+        parts.append(english)
+    pos_parts = [p for p in [entry.get("part_of_speech"), entry.get("sub_part_of_speech")] if p]
+    if pos_parts:
+        parts.append(" · ".join(pos_parts))
+    if entry.get("audio"):
+        parts.append("Audio available")
+    return truncate_og(" · ".join(parts) if parts else "Penobscot Dictionary entry")
+
+
+def build_og_meta(
+    *,
+    title: str,
+    description: str,
+    url: str,
+    og_type: str = "website",
+    image_url: str | None = None,
+) -> str:
+    desc = truncate_og(description)
+    tags = [
+        f'<meta name="description" content="{esc(desc)}">',
+        f'<link rel="canonical" href="{esc(url)}">',
+        f'<meta property="og:title" content="{esc(title)}">',
+        f'<meta property="og:description" content="{esc(desc)}">',
+        f'<meta property="og:url" content="{esc(url)}">',
+        f'<meta property="og:site_name" content="Penobscot Dictionary">',
+        f'<meta property="og:type" content="{og_type}">',
+        f'<meta property="og:locale" content="en_US">',
+        f'<meta name="twitter:card" content="summary">',
+        f'<meta name="twitter:title" content="{esc(title)}">',
+        f'<meta name="twitter:description" content="{esc(desc)}">',
+    ]
+    if image_url:
+        tags.extend([
+            f'<meta property="og:image" content="{esc(image_url)}">',
+            f'<meta name="twitter:image" content="{esc(image_url)}">',
+        ])
+    return "\n  ".join(tags)
+
+
 def page_shell(
     title: str,
     body: str,
@@ -94,6 +145,7 @@ def page_shell(
     asset_prefix: str = "",
     extra_scripts: str = "",
     body_class: str = "",
+    og_meta: str = "",
 ) -> str:
     ap = asset_prefix
     nav_home = f"{ap}index.html"
@@ -115,7 +167,7 @@ def page_shell(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(title)} | Penobscot Dictionary</title>
-  <link rel="stylesheet" href="{ap}assets/style.css">
+  {f"{og_meta}\n  " if og_meta else ""}<link rel="stylesheet" href="{ap}assets/style.css">
 </head>
 <body{bc}>
   {nav}
@@ -458,7 +510,16 @@ def build_entry_page(
     scripts = """
     <script src="../assets/audio-player.js"></script>
     <script>PenobscotAudio.initPage();</script>"""
-    return page_shell(hw, body, active="browse", asset_prefix="../", extra_scripts=scripts)
+    eid = entry.get("id", "")
+    og_meta = build_og_meta(
+        title=hw,
+        description=entry_og_description(entry),
+        url=f"{SITE_MIRROR_URL}/entry/{eid}.html",
+        og_type="article",
+    )
+    return page_shell(
+        hw, body, active="browse", asset_prefix="../", extra_scripts=scripts, og_meta=og_meta
+    )
 
 
 def build_letter_page(letter: str, letter_entries: list[dict]) -> str:

@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import unicodedata
 from pathlib import Path
 
 BASE_URL = "https://penobscot-dictionary.appspot.com"
+# Public URL for Open Graph / Discord embeds (override with PENOBSCOT_SITE_URL).
+SITE_MIRROR_URL = os.environ.get(
+    "PENOBSCOT_SITE_URL", "https://penobscot.brokengameplay.com"
+).rstrip("/")
 AUDIO_BUCKET = "https://storage.googleapis.com/penobscot_dictionary_audiofile_storage"
 
 ROOT = Path(__file__).resolve().parent.parent
