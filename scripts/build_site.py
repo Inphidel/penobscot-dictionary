@@ -19,6 +19,7 @@ from common import (
     ENTRIES_JSON,
     KINSHIP_INDEX_JSON,
     GUESSER_FORMS_JSON,
+    LISTEN3_DECKS_JSON,
     SEMANTIC_TAGS_JSON,
     SENTENCE_EXAMPLES_JSON,
     SITE_DIR,
@@ -28,6 +29,7 @@ from common import (
     load_json,
     save_json,
 )
+import re
 
 LUNR_LOCAL = "assets/lunr.min.js"
 
@@ -777,6 +779,7 @@ def build_about_page(meta: dict) -> str:
         <li><strong>English → possible Penobscot</strong> — type normal English; the Lab matches dictionary definitions and suggests forms (with reasoning).</li>
         <li><strong>Penobscot → possible meaning</strong> — type a form you heard (plain letters OK); shows meaning first, then prefix/stem guesses.</li>
         <li><strong>Themes</strong> — browse words tagged from English glosses (animals, body, objects, nature, food, …). Tags boost related Lab matches.</li>
+        <li><strong>Listen-3</strong> — hear a recording, pick the matching English from three choices; choose themes to brush up on.</li>
         <li><strong>Perspective &amp; kinship</strong> — browse by mother, father, child, my/his/her, older/younger, feminine endings, etc., with pattern hints.</li>
       </ul>
       <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel (including <strong>Related by meaning</strong> from theme tags);
@@ -816,12 +819,163 @@ python scripts/build_site.py</pre>
     return page_shell("About", body, active="about")
 
 
+def short_english_for_game(en: str, max_len: int = 110) -> str:
+    """First sense / clause for multiple-choice labels."""
+    text = (en or "").strip()
+    if not text:
+        return ""
+    if re.match(r"^\s*1\)", text):
+        text = re.split(r"\s*2\)\s*", text, maxsplit=1)[0]
+        text = re.sub(r"^\s*1\)\s*", "", text)
+    if ";" in text:
+        text = text.split(";", 1)[0]
+    text = text.strip(" ,;")
+    # strip sciname markup noise for choices
+    text = re.sub(r"⟨/?sciname⟩", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > max_len:
+        cut = text[: max_len - 1]
+        if " " in cut:
+            cut = cut.rsplit(" ", 1)[0]
+        text = cut + "…"
+    return text
+
+
+def build_listen3_decks(entries: dict, semantic_index: dict) -> dict:
+    """Slim decks: theme tag → playable cards with audio."""
+    by_tag = semantic_index.get("by_tag") or {}
+    tag_meta = {t["id"]: t for t in (semantic_index.get("tags") or [])}
+    groups = semantic_index.get("groups") or []
+    decks: dict[str, list] = {}
+    tag_list: list[dict] = []
+
+    for tid, cards in by_tag.items():
+        playable = []
+        seen: set[str] = set()
+        for card in cards:
+            eid = card.get("entry_id")
+            if not eid or eid in seen:
+                continue
+            entry = entries.get(eid) or {}
+            audio = card.get("audio_main") or ""
+            if not audio:
+                for a in entry.get("audio") or []:
+                    if a.get("type") != "guide" and a.get("local_path"):
+                        audio = a["local_path"]
+                        break
+            if not audio:
+                continue
+            en = card.get("english") or entry.get("english") or ""
+            short = short_english_for_game(en)
+            if len(short) < 3:
+                continue
+            seen.add(eid)
+            alt = card.get("audio_alt") or ""
+            playable.append({
+                "entry_id": eid,
+                "headword": card.get("headword") or entry.get("headword") or "",
+                "english": en,
+                "english_short": short,
+                "audio": audio,
+                "audio_alt": alt,
+            })
+        if len(playable) < 3:
+            continue
+        playable.sort(key=lambda x: (x.get("headword") or "").lower())
+        decks[tid] = playable
+        meta = tag_meta.get(tid) or {}
+        tag_list.append({
+            "id": tid,
+            "label": meta.get("label") or tid,
+            "group": meta.get("group") or "other",
+            "description": meta.get("description") or "",
+            "count": len(playable),
+        })
+
+    tag_list.sort(key=lambda t: (-t["count"], t["label"]))
+    total = len({c["entry_id"] for items in decks.values() for c in items})
+    return {
+        "meta": {
+            "min_deck": 3,
+            "playable_tags": len(tag_list),
+            "playable_entries": total,
+            "source": "semantic_tags + entries audio",
+        },
+        "groups": groups,
+        "tags": tag_list,
+        "decks": decks,
+    }
+
+
+def build_listen3_page() -> str:
+    body = f"""
+    <header class="hero lab-hero">
+      <p class="badge-row">{badge_lab()}</p>
+      <h1>Listen-3</h1>
+      <p class="subtitle">Hear a recording — choose the matching English (1 of 3)</p>
+    </header>
+
+    <section id="listen3-setup" class="lab-panel listen3-panel">
+      <p class="lab-hint">Pick one or more <strong>themes</strong> to brush up on. Only words with audio are included.
+      Wrong answers usually come from the same theme. Study tool — not a fluency test.</p>
+      <div class="listen3-toolbar">
+        <label class="listen3-size-label">Round size
+          <select id="listen3-size">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="0">All in deck</option>
+          </select>
+        </label>
+        <button type="button" id="listen3-clear" class="btn-secondary">Clear themes</button>
+        <button type="button" id="listen3-start" class="btn-analyze" disabled>Start</button>
+      </div>
+      <p id="listen3-deck-info" class="muted listen3-deck-info"></p>
+      <div id="listen3-tags" class="kinship-cats"></div>
+    </section>
+
+    <section id="listen3-play" class="lab-panel listen3-panel" hidden>
+      <div class="listen3-status-bar">
+        <span id="listen3-progress" class="listen3-progress">1 / 10</span>
+        <span id="listen3-score" class="listen3-score">0 correct</span>
+      </div>
+      <div class="listen3-audio-block">
+        <p class="breakdown-label">Listen</p>
+        <button type="button" id="listen3-play-btn" class="btn-play listen3-big-play" title="Play recording">&#9654; Play</button>
+        <p class="muted listen3-replay-hint">Tap again to replay</p>
+      </div>
+      <p class="breakdown-label">Which English matches?</p>
+      <div id="listen3-choices" class="listen3-choices"></div>
+      <div id="listen3-feedback" class="listen3-feedback" hidden></div>
+      <button type="button" id="listen3-next" class="btn-analyze listen3-next" hidden>Next</button>
+    </section>
+
+    <section id="listen3-done" class="lab-panel listen3-panel" hidden>
+      <h2>Session done</h2>
+      <div id="listen3-summary"></div>
+      <div class="listen3-done-actions">
+        <button type="button" id="listen3-again" class="btn-analyze">Play again</button>
+        <button type="button" id="listen3-change" class="btn-secondary">Change themes</button>
+        <a class="btn-lab-link" href="index.html">Back to Lab &#8594;</a>
+      </div>
+    </section>
+
+    <section class="archive-panel about-section">
+      <p><a href="index.html">Lab tools</a> · <a href="../index.html">Search archive</a></p>
+    </section>
+    <script src="../assets/audio-player.js"></script>
+    <script src="../assets/listen3.js"></script>"""
+    return page_shell("Listen-3", body, active="lab", asset_prefix="../", body_class="lab-page")
+
+
 def build_lab_page() -> str:
     body = f"""
     <header class="hero lab-hero">
       <p class="badge-row">{badge_lab()}</p>
       <h1>Lab</h1>
       <p class="subtitle">Type English for possible Penobscot — or type a form you heard (plain letters OK)</p>
+      <p class="lab-game-cta"><a class="btn-lab-cta" href="listen3.html">Play Listen-3 &#8594;</a>
+        <span class="muted"> Hear a word, pick the English (by theme)</span></p>
     </header>
 
     <section class="lab-panel">
@@ -1357,6 +1511,7 @@ AUDIO_PLAYER_JS = textwrap.dedent("""\
 LAB_GUESSER_JS = (Path(__file__).parent / "lab_guesser.js").read_text(encoding="utf-8")
 KINSHIP_JS = (Path(__file__).parent / "kinship.js").read_text(encoding="utf-8")
 SEMANTIC_TAGS_JS = (Path(__file__).parent / "semantic_tags.js").read_text(encoding="utf-8")
+LISTEN3_JS = (Path(__file__).parent / "listen3.js").read_text(encoding="utf-8")
 
 STYLE_CSS = textwrap.dedent("""\
     :root {
@@ -1416,6 +1571,49 @@ STYLE_CSS = textwrap.dedent("""\
     .guesser-form input { flex: 1; min-width: 200px; padding: 0.85rem 1rem; font-size: 1.1rem; border: 2px solid var(--lab-border); border-radius: var(--radius); font-family: var(--font-word); }
     .btn-analyze { padding: 0.85rem 1.5rem; background: var(--lab-accent); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; }
     .btn-analyze:hover { opacity: 0.92; }
+    .btn-analyze:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-secondary {
+      padding: 0.65rem 1rem; background: var(--surface); color: var(--text);
+      border: 1px solid var(--lab-border); border-radius: var(--radius); font-size: 0.95rem; cursor: pointer;
+    }
+    .btn-secondary:hover { border-color: var(--lab-accent); color: var(--lab-accent); }
+    .lab-game-cta { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; }
+    .lab-game-cta .btn-lab-cta { margin-top: 0; }
+    .listen3-panel { max-width: 40rem; }
+    .listen3-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+    .listen3-size-label { font-size: 0.9rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; }
+    .listen3-size-label select { padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border); }
+    .listen3-deck-info { margin-bottom: 1rem; }
+    .listen3-status-bar { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.95rem; color: var(--muted); }
+    .listen3-audio-block { text-align: center; margin: 1.25rem 0 1.5rem; padding: 1.25rem; background: #fff; border: 1px solid var(--lab-border); border-radius: var(--radius); }
+    .listen3-big-play {
+      font-size: 1.15rem; padding: 0.85rem 1.75rem; min-width: 8rem;
+      border-radius: 999px; border: 2px solid var(--lab-accent); background: var(--lab-bg);
+      color: var(--lab-accent); cursor: pointer; font-weight: 700;
+    }
+    .listen3-big-play.playing { background: var(--lab-accent); color: #fff; }
+    .listen3-big-play.loading { opacity: 0.6; }
+    .listen3-replay-hint { margin-top: 0.5rem; font-size: 0.85rem; }
+    .listen3-choices { display: flex; flex-direction: column; gap: 0.65rem; margin: 0.75rem 0 1rem; }
+    .listen3-choice {
+      text-align: left; padding: 0.85rem 1rem; border-radius: var(--radius);
+      border: 1px solid var(--lab-border); background: var(--surface); cursor: pointer;
+      font-size: 1rem; line-height: 1.35; color: var(--text);
+    }
+    .listen3-choice:hover:not(:disabled) { border-color: var(--lab-accent); background: var(--lab-bg); }
+    .listen3-choice:disabled { cursor: default; }
+    .listen3-choice.is-correct { border-color: var(--accent); background: var(--accent-light); }
+    .listen3-choice.is-wrong { border-color: #b54a4a; background: #fceeed; }
+    .listen3-feedback { margin: 1rem 0; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1px solid var(--lab-border); background: #fff; }
+    .listen3-feedback.ok { border-left: 4px solid var(--accent); }
+    .listen3-feedback.bad { border-left: 4px solid #b54a4a; }
+    .listen3-fb-title { font-weight: 700; margin: 0 0 0.35rem; }
+    .listen3-fb-hw { font-family: var(--font-word); font-size: 1.25rem; font-weight: 600; color: var(--lab-accent); margin: 0.25rem 0; }
+    .listen3-fb-en { margin: 0.35rem 0; }
+    .listen3-fb-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.65rem; }
+    .listen3-next { width: 100%; margin-top: 0.5rem; }
+    .listen3-done-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem; }
+    .listen3-summary-score { font-size: 1.35rem; font-weight: 700; color: var(--lab-accent); }
     .lab-hint { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
     .lab-mode { font-size: 0.88rem; margin: -0.5rem 0 0.75rem; font-style: italic; }
     .lab-subhead { color: var(--lab-accent); font-size: 0.95rem; margin: 1.5rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1671,6 +1869,15 @@ def main() -> int:
 
     semantic_index = load_json(SEMANTIC_TAGS_JSON, {}) if SEMANTIC_TAGS_JSON.exists() else {}
 
+    print("Building Listen-3 decks...")
+    listen3 = build_listen3_decks(entries, semantic_index)
+    save_json(LISTEN3_DECKS_JSON, listen3)
+    save_json(assets / "listen3-decks.json", listen3)
+    print(
+        f"Listen-3: {listen3['meta']['playable_tags']} theme decks, "
+        f"{listen3['meta']['playable_entries']} unique words with audio"
+    )
+
     by_letter: dict[str, list] = {}
     for entry in entries.values():
         for letter in entry.get("browse_letters") or ["uncategorized"]:
@@ -1700,12 +1907,14 @@ def main() -> int:
     (SITE_DIR / "browse.html").write_text(build_browse_page(by_letter), encoding="utf-8")
     (SITE_DIR / "about.html").write_text(build_about_page(meta), encoding="utf-8")
     (lab_dir / "index.html").write_text(build_lab_page(), encoding="utf-8")
+    (lab_dir / "listen3.html").write_text(build_listen3_page(), encoding="utf-8")
     (assets / "style.css").write_text(STYLE_CSS, encoding="utf-8")
     (assets / "search.js").write_text(SEARCH_JS, encoding="utf-8")
     (assets / "audio-player.js").write_text(AUDIO_PLAYER_JS, encoding="utf-8")
     (assets / "lab-guesser.js").write_text(LAB_GUESSER_JS, encoding="utf-8")
     (assets / "kinship.js").write_text(KINSHIP_JS, encoding="utf-8")
     (assets / "semantic-tags.js").write_text(SEMANTIC_TAGS_JS, encoding="utf-8")
+    (assets / "listen3.js").write_text(LISTEN3_JS, encoding="utf-8")
     (assets / "pos-tooltips.js").write_text(build_tooltips_js(), encoding="utf-8")
 
     search_docs = build_search_index(entries)

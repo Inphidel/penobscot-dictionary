@@ -79,7 +79,7 @@ python scripts/normalize_audio.py # required after crawl — restore ~-15 LUFS
 
 - **Search** — Penobscot or English; partial Penobscot fragments show amber Lab matches
 - **Browse** — by sound/letter (a, č, kʷ, root, …)
-- **Lab** — English → possible Penobscot; Penobscot → meaning; **Themes** (animals, body, objects, …) and kinship/perspective browse
+- **Lab** — English → possible Penobscot; Penobscot → meaning; **Themes**; **Listen-3** (hear audio, pick English by theme); kinship/perspective browse
 - **Audio** — play, loop, save recordings on entry and search results
 - **POS labels** — hover abbreviations (AI, INAN, Initial, …) for explanations
 

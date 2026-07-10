@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listen-3 | Penobscot Dictionary</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="lab-page">
+  
+    <nav class="nav">
+      <a href="../index.html" class="brand">Penobscot Dictionary</a>
+      <a href="../index.html" class="">Search</a>
+      <a href="../browse.html" class="">Browse</a>
+      <a href="../lab/index.html" class="active">Lab</a>
+      <a href="../about.html" class="">About</a>
+    </nav>
+  <main class="container">
+    
+    <header class="hero lab-hero">
+      <p class="badge-row"><span class="badge badge-lab">Experimental Lab — verify with audio &amp; speakers</span></p>
+      <h1>Listen-3</h1>
+      <p class="subtitle">Hear a recording — choose the matching English (1 of 3)</p>
+    </header>
+
+    <section id="listen3-setup" class="lab-panel listen3-panel">
+      <p class="lab-hint">Pick one or more <strong>themes</strong> to brush up on. Only words with audio are included.
+      Wrong answers usually come from the same theme. Study tool — not a fluency test.</p>
+      <div class="listen3-toolbar">
+        <label class="listen3-size-label">Round size
+          <select id="listen3-size">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="0">All in deck</option>
+          </select>
+        </label>
+        <button type="button" id="listen3-clear" class="btn-secondary">Clear themes</button>
+        <button type="button" id="listen3-start" class="btn-analyze" disabled>Start</button>
+      </div>
+      <p id="listen3-deck-info" class="muted listen3-deck-info"></p>
+      <div id="listen3-tags" class="kinship-cats"></div>
+    </section>
+
+    <section id="listen3-play" class="lab-panel listen3-panel" hidden>
+      <div class="listen3-status-bar">
+        <span id="listen3-progress" class="listen3-progress">1 / 10</span>
+        <span id="listen3-score" class="listen3-score">0 correct</span>
+      </div>
+      <div class="listen3-audio-block">
+        <p class="breakdown-label">Listen</p>
+        <button type="button" id="listen3-play-btn" class="btn-play listen3-big-play" title="Play recording">&#9654; Play</button>
+        <p class="muted listen3-replay-hint">Tap again to replay</p>
+      </div>
+      <p class="breakdown-label">Which English matches?</p>
+      <div id="listen3-choices" class="listen3-choices"></div>
+      <div id="listen3-feedback" class="listen3-feedback" hidden></div>
+      <button type="button" id="listen3-next" class="btn-analyze listen3-next" hidden>Next</button>
+    </section>
+
+    <section id="listen3-done" class="lab-panel listen3-panel" hidden>
+      <h2>Session done</h2>
+      <div id="listen3-summary"></div>
+      <div class="listen3-done-actions">
+        <button type="button" id="listen3-again" class="btn-analyze">Play again</button>
+        <button type="button" id="listen3-change" class="btn-secondary">Change themes</button>
+        <a class="btn-lab-link" href="index.html">Back to Lab &#8594;</a>
+      </div>
+    </section>
+
+    <section class="archive-panel about-section">
+      <p><a href="index.html">Lab tools</a> · <a href="../index.html">Search archive</a></p>
+    </section>
+    <script src="../assets/audio-player.js"></script>
+    <script src="../assets/listen3.js"></script>
+  </main>
+  <footer class="footer">
+    <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
+    (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
+    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+  </footer>
+  <script src="../assets/pos-tooltips.js"></script>
+  
+</body>
+</html>
