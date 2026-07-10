@@ -91,6 +91,7 @@ function showTheme(tagId) {
     <div class="kinship-results-head">
       <h3>${escapeHtmlTheme(tag.label)}</h3>
       <p class="muted">${escapeHtmlTheme(tag.description || '')} — ${items.length} archive ${items.length === 1 ? 'entry' : 'entries'}. Tags are guesses from English glosses, not official categories.</p>
+      <p class="theme-practice"><a class="btn-games-link" href="../games/listen3.html?theme=${encodeURIComponent(tagId)}">Practice in Listen-3 &#8594;</a></p>
     </div>
     <div class="kinship-cards">${cards || '<p class="muted">No entries.</p>'}</div>`;
 

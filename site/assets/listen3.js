@@ -254,7 +254,7 @@
         <p class="listen3-fb-en">${esc(full)}</p>
         <p class="listen3-fb-links">
           <a class="btn-archive-link" href="../entry/${esc(item.entry_id)}.html">Archive entry &#8594;</a>
-          <a class="btn-lab-link" href="index.html?q=${encodeURIComponent(item.headword)}">Lab &#8594;</a>
+          <a class="btn-lab-link" href="../lab/index.html?q=${encodeURIComponent(item.headword)}">Lab &#8594;</a>
         </p>`;
     }
 

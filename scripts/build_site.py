@@ -91,6 +91,10 @@ def badge_lab() -> str:
     return '<span class="badge badge-lab">Experimental Lab — verify with audio &amp; speakers</span>'
 
 
+def badge_games() -> str:
+    return '<span class="badge badge-games">Study games — practice with archive audio</span>'
+
+
 def truncate_og(text: str, max_len: int = 280) -> str:
     text = " ".join((text or "").split())
     if len(text) <= max_len:
@@ -154,14 +158,21 @@ def page_shell(
     nav_home = f"{ap}index.html"
     nav_browse = f"{ap}browse.html"
     nav_lab = f"{ap}lab/index.html"
+    nav_games = f"{ap}games/index.html"
     nav_about = f"{ap}about.html"
     bc = f' class="{body_class}"' if body_class else ""
+    nav_class = "nav"
+    if body_class == "lab-page":
+        nav_class = "nav nav-lab"
+    elif body_class == "games-page":
+        nav_class = "nav nav-games"
     nav = f"""
-    <nav class="nav">
+    <nav class="{nav_class}">
       <a href="{nav_home}" class="brand">Penobscot Dictionary</a>
       <a href="{nav_home}" class="{'active' if active == 'home' else ''}">Search</a>
       <a href="{nav_browse}" class="{'active' if active == 'browse' else ''}">Browse</a>
       <a href="{nav_lab}" class="{'active' if active == 'lab' else ''}">Lab</a>
+      <a href="{nav_games}" class="{'active' if active == 'games' else ''}">Games</a>
       <a href="{nav_about}" class="{'active' if active == 'about' else ''}">About</a>
     </nav>"""
     return f"""<!DOCTYPE html>
@@ -180,7 +191,7 @@ def page_shell(
   <footer class="footer">
     <p><strong>Archive</strong> — data from the <a href="https://penobscot-dictionary.appspot.com/entry/" target="_blank" rel="noopener">Penobscot Dictionary</a>
     (Penobscot Indian Nation, University of Maine, American Philosophical Society). Based on the manuscript of Frank T. Siebert.</p>
-    <p><strong>Lab tools</strong> are local experiments — pattern guesses only, not official dictionary entries.</p>
+    <p><strong>Lab</strong> tools and <strong>Games</strong> are local study aids — not official dictionary entries. Verify with audio and speakers.</p>
   </footer>
   <script src="{ap}assets/pos-tooltips.js"></script>
   {extra_scripts}
@@ -537,19 +548,31 @@ def build_related_panel(
         if my_tags:
             chip_html = []
             seen_t = set()
+            practice_tid = ""
             for h in my_tags:
                 tid = h["tag_id"]
                 if tid in seen_t or tid == "species":
                     continue
                 seen_t.add(tid)
+                if not practice_tid and h.get("specificity") in ("lemma", "theme"):
+                    practice_tid = tid
                 chip_html.append(
-                    f'<a class="theme-chip" href="../lab/index.html?theme={quote(tid, safe="")}">'
+                    f'<a class="theme-chip" href="../lab/index.html?theme={quote(tid, safe="")}" title="Browse in Lab">'
                     f'{esc(h.get("label") or tid)}</a>'
                 )
                 if len(chip_html) >= 8:
                     break
+            if not practice_tid and my_tags:
+                practice_tid = my_tags[0].get("tag_id") or ""
+            practice = ""
+            if practice_tid:
+                practice = (
+                    f' <a class="theme-chip theme-chip-games" '
+                    f'href="../games/listen3.html?theme={quote(practice_tid, safe="")}" '
+                    f'title="Practice this theme in Listen-3">Listen-3</a>'
+                )
             if chip_html:
-                chips = f'<p class="theme-chips">Themes: {" ".join(chip_html)}</p>'
+                chips = f'<p class="theme-chips">Themes: {" ".join(chip_html)}{practice}</p>'
         meaning_items = "".join(
             related_entry_row(other, reason, "../") for other, reason in meaning_neighbors
         )
@@ -779,13 +802,20 @@ def build_about_page(meta: dict) -> str:
         <li><strong>English → possible Penobscot</strong> — type normal English; the Lab matches dictionary definitions and suggests forms (with reasoning).</li>
         <li><strong>Penobscot → possible meaning</strong> — type a form you heard (plain letters OK); shows meaning first, then prefix/stem guesses.</li>
         <li><strong>Themes</strong> — browse words tagged from English glosses (animals, body, objects, nature, food, …). Tags boost related Lab matches.</li>
-        <li><strong>Listen-3</strong> — hear a recording, pick the matching English from three choices; choose themes to brush up on.</li>
         <li><strong>Perspective &amp; kinship</strong> — browse by mother, father, child, my/his/her, older/younger, feminine endings, etc., with pattern hints.</li>
       </ul>
       <p>Elsewhere: entry pages have an amber <strong>Related forms</strong> panel (including <strong>Related by meaning</strong> from theme tags);
       <strong>Search</strong> shows amber <strong>partial matches</strong> when you type a fragment of a word.</p>
       <p>Always verify with audio and fluent speakers before trusting a Lab result.</p>
       <p><a href="lab/index.html" class="btn-lab-cta">Open Lab</a></p>
+    </section>
+
+    <section class="games-panel about-section">
+      <h2>Games (study practice)</h2>
+      <p class="badge-row">{badge_games()}</p>
+      <p>Purple <strong>Games</strong> are listening and quiz drills using archive audio and theme tags.
+      Start with <strong>Listen-3</strong>: hear a word, pick the matching English from three choices.</p>
+      <p><a href="games/index.html" class="btn-games-cta">Open Games</a></p>
     </section>
 
     <section class="about-section">
@@ -907,16 +937,46 @@ def build_listen3_decks(entries: dict, semantic_index: dict) -> dict:
     }
 
 
+def build_games_hub() -> str:
+    body = f"""
+    <header class="hero games-hero">
+      <p class="badge-row">{badge_games()}</p>
+      <h1>Games</h1>
+      <p class="subtitle">Practice with archive audio — study drills, not official lessons</p>
+    </header>
+
+    <section class="games-panel">
+      <div class="game-cards">
+        <a class="game-card" href="listen3.html">
+          <span class="game-card-badge">Listening</span>
+          <h2 class="game-card-title">Listen-3</h2>
+          <p class="game-card-desc">Hear a recording, then pick the matching English from three choices.
+          Choose themes (dogs, hide, canoe, …) to brush up on what you care about.</p>
+          <span class="game-card-go">Play Listen-3 &#8594;</span>
+        </a>
+      </div>
+      <p class="muted games-hub-note">More games can land here later. Themes for practice come from Lab tag mining of English glosses.</p>
+    </section>
+
+    <section class="archive-panel about-section">
+      <h2>Looking for definitions?</h2>
+      <p>Use <a href="../index.html">Search</a> or <a href="../browse.html">Browse</a> — green archive pages.
+      For pattern tools, open <a href="../lab/index.html">Lab</a>.</p>
+    </section>"""
+    return page_shell("Games", body, active="games", asset_prefix="../", body_class="games-page")
+
+
 def build_listen3_page() -> str:
     body = f"""
-    <header class="hero lab-hero">
-      <p class="badge-row">{badge_lab()}</p>
+    <header class="hero games-hero">
+      <p class="badge-row">{badge_games()}</p>
+      <p class="games-crumb"><a href="index.html">Games</a> / Listen-3</p>
       <h1>Listen-3</h1>
       <p class="subtitle">Hear a recording — choose the matching English (1 of 3)</p>
     </header>
 
-    <section id="listen3-setup" class="lab-panel listen3-panel">
-      <p class="lab-hint">Pick one or more <strong>themes</strong> to brush up on. Only words with audio are included.
+    <section id="listen3-setup" class="games-panel listen3-panel">
+      <p class="games-hint">Pick one or more <strong>themes</strong> to brush up on. Only words with audio are included.
       Wrong answers usually come from the same theme. Study tool — not a fluency test.</p>
       <div class="listen3-toolbar">
         <label class="listen3-size-label">Round size
@@ -927,14 +987,14 @@ def build_listen3_page() -> str:
             <option value="0">All in deck</option>
           </select>
         </label>
-        <button type="button" id="listen3-clear" class="btn-secondary">Clear themes</button>
-        <button type="button" id="listen3-start" class="btn-analyze" disabled>Start</button>
+        <button type="button" id="listen3-clear" class="btn-secondary btn-games-secondary">Clear themes</button>
+        <button type="button" id="listen3-start" class="btn-games" disabled>Start</button>
       </div>
       <p id="listen3-deck-info" class="muted listen3-deck-info"></p>
-      <div id="listen3-tags" class="kinship-cats"></div>
+      <div id="listen3-tags" class="kinship-cats listen3-tags"></div>
     </section>
 
-    <section id="listen3-play" class="lab-panel listen3-panel" hidden>
+    <section id="listen3-play" class="games-panel listen3-panel" hidden>
       <div class="listen3-status-bar">
         <span id="listen3-progress" class="listen3-progress">1 / 10</span>
         <span id="listen3-score" class="listen3-score">0 correct</span>
@@ -947,25 +1007,25 @@ def build_listen3_page() -> str:
       <p class="breakdown-label">Which English matches?</p>
       <div id="listen3-choices" class="listen3-choices"></div>
       <div id="listen3-feedback" class="listen3-feedback" hidden></div>
-      <button type="button" id="listen3-next" class="btn-analyze listen3-next" hidden>Next</button>
+      <button type="button" id="listen3-next" class="btn-games listen3-next" hidden>Next</button>
     </section>
 
-    <section id="listen3-done" class="lab-panel listen3-panel" hidden>
+    <section id="listen3-done" class="games-panel listen3-panel" hidden>
       <h2>Session done</h2>
       <div id="listen3-summary"></div>
       <div class="listen3-done-actions">
-        <button type="button" id="listen3-again" class="btn-analyze">Play again</button>
-        <button type="button" id="listen3-change" class="btn-secondary">Change themes</button>
-        <a class="btn-lab-link" href="index.html">Back to Lab &#8594;</a>
+        <button type="button" id="listen3-again" class="btn-games">Play again</button>
+        <button type="button" id="listen3-change" class="btn-secondary btn-games-secondary">Change themes</button>
+        <a class="btn-games-link" href="index.html">All Games &#8594;</a>
       </div>
     </section>
 
     <section class="archive-panel about-section">
-      <p><a href="index.html">Lab tools</a> · <a href="../index.html">Search archive</a></p>
+      <p><a href="index.html">Games</a> · <a href="../lab/index.html">Lab</a> · <a href="../index.html">Search archive</a></p>
     </section>
     <script src="../assets/audio-player.js"></script>
     <script src="../assets/listen3.js"></script>"""
-    return page_shell("Listen-3", body, active="lab", asset_prefix="../", body_class="lab-page")
+    return page_shell("Listen-3", body, active="games", asset_prefix="../", body_class="games-page")
 
 
 def build_lab_page() -> str:
@@ -974,8 +1034,6 @@ def build_lab_page() -> str:
       <p class="badge-row">{badge_lab()}</p>
       <h1>Lab</h1>
       <p class="subtitle">Type English for possible Penobscot — or type a form you heard (plain letters OK)</p>
-      <p class="lab-game-cta"><a class="btn-lab-cta" href="listen3.html">Play Listen-3 &#8594;</a>
-        <span class="muted"> Hear a word, pick the English (by theme)</span></p>
     </header>
 
     <section class="lab-panel">
@@ -995,7 +1053,8 @@ def build_lab_page() -> str:
     <section class="lab-panel themes-panel">
       <h2>Themes (from English glosses)</h2>
       <p class="muted">Experimental tags mined from dictionary English — animals, body, objects, nature, food, motion, and more.
-      Not speaker categories. Use to browse related words; always verify with audio.</p>
+      Not speaker categories. Browse related words here; practice listening under
+      <a href="../games/index.html">Games</a> (Listen-3).</p>
       <div id="theme-cats" class="kinship-cats"></div>
       <div id="theme-results" class="kinship-results"></div>
     </section>
@@ -1524,6 +1583,9 @@ STYLE_CSS = textwrap.dedent("""\
       --lab-accent: #9a6b1a;
       --lab-bg: #fdf6e8;
       --lab-border: #e8d4a8;
+      --games-accent: #6b3fa0;
+      --games-bg: #f5f0fb;
+      --games-border: #d4c4e8;
       --border: #ddd5c8;
       --radius: 10px;
       --font: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -1531,10 +1593,12 @@ STYLE_CSS = textwrap.dedent("""\
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
-    .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 2rem; background: var(--accent); color: #fff; }
+    .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.35rem; padding: 1rem 2rem; background: var(--accent); color: #fff; }
     .nav a { color: #fff; text-decoration: none; opacity: 0.85; }
     .nav a:hover, .nav a.active { opacity: 1; text-decoration: underline; }
     .nav .brand { font-weight: 700; font-size: 1.1rem; opacity: 1; margin-right: auto; }
+    .nav-lab { background: var(--lab-accent); }
+    .nav-games { background: var(--games-accent); }
     .container { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 2rem 1.5rem; }
     .footer { text-align: center; padding: 1.5rem; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--border); }
     .footer a { color: var(--accent); }
@@ -1550,10 +1614,50 @@ STYLE_CSS = textwrap.dedent("""\
     .badge { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; padding: 0.35rem 0.65rem; border-radius: 6px; }
     .badge-archive { background: var(--accent-light); color: var(--accent); border: 1px solid #b8d4be; }
     .badge-lab { background: var(--lab-bg); color: var(--lab-accent); border: 1px solid var(--lab-border); }
+    .badge-games { background: var(--games-bg); color: var(--games-accent); border: 1px solid var(--games-border); }
     .archive-panel { border-left: 4px solid var(--accent); padding-left: 1rem; }
     .lab-panel { background: var(--lab-bg); border: 1px solid var(--lab-border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
     .lab-page { --accent: var(--lab-accent); }
     .lab-hero h1 { color: var(--lab-accent); }
+    .games-panel { background: var(--games-bg); border: 1px solid var(--games-border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+    .games-page { --accent: var(--games-accent); }
+    .games-hero h1 { color: var(--games-accent); }
+    .games-crumb { font-size: 0.9rem; margin-bottom: 0.35rem; }
+    .games-crumb a { color: var(--games-accent); font-weight: 600; text-decoration: none; }
+    .games-crumb a:hover { text-decoration: underline; }
+    .games-hint { font-size: 0.95rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .games-panel.about-section h2 { color: var(--games-accent); }
+    .btn-games-cta { display: inline-block; margin-top: 0.5rem; padding: 0.65rem 1.25rem; background: var(--games-accent); color: #fff; border-radius: var(--radius); text-decoration: none; font-weight: 600; }
+    .btn-games-cta:hover { opacity: 0.9; }
+    .btn-games {
+      padding: 0.85rem 1.5rem; background: var(--games-accent); color: #fff; border: none;
+      border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-games:hover { opacity: 0.92; }
+    .btn-games:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-games-link { font-size: 0.9rem; color: var(--games-accent); font-weight: 600; text-decoration: none; }
+    .btn-games-link:hover { text-decoration: underline; }
+    .btn-games-secondary:hover { border-color: var(--games-accent); color: var(--games-accent); }
+    .game-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .game-card {
+      display: block; text-decoration: none; color: inherit;
+      background: #fff; border: 1px solid var(--games-border); border-left: 4px solid var(--games-accent);
+      border-radius: var(--radius); padding: 1.15rem 1.25rem; transition: box-shadow 0.12s, border-color 0.12s;
+    }
+    .game-card:hover { box-shadow: 0 4px 14px rgba(107, 63, 160, 0.12); border-color: var(--games-accent); }
+    .game-card-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--games-accent); background: var(--games-bg);
+      border: 1px solid var(--games-border); border-radius: 999px; padding: 0.2rem 0.55rem; margin-bottom: 0.5rem;
+    }
+    .game-card-title { color: var(--games-accent); font-size: 1.35rem; margin: 0 0 0.4rem; }
+    .game-card-desc { color: var(--muted); font-size: 0.95rem; margin: 0 0 0.75rem; }
+    .game-card-go { font-weight: 700; color: var(--games-accent); }
+    .games-hub-note { margin-top: 1rem; }
+    .listen3-tags .kinship-btn:hover, .listen3-tags .kinship-btn.active {
+      background: var(--games-bg); border-color: var(--games-accent); color: var(--games-accent);
+    }
+    .listen3-tags .kinship-btn.active .kinship-count { color: var(--games-accent); }
     .search-toolbar { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-top: 0.5rem; }
     .search-toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
     .btn-lab-link { font-size: 0.9rem; color: var(--lab-accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
@@ -1577,8 +1681,7 @@ STYLE_CSS = textwrap.dedent("""\
       border: 1px solid var(--lab-border); border-radius: var(--radius); font-size: 0.95rem; cursor: pointer;
     }
     .btn-secondary:hover { border-color: var(--lab-accent); color: var(--lab-accent); }
-    .lab-game-cta { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; }
-    .lab-game-cta .btn-lab-cta { margin-top: 0; }
+    .theme-practice { margin-top: 0.65rem; }
     .listen3-panel { max-width: 40rem; }
     .listen3-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0; }
     .listen3-size-label { font-size: 0.9rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; }
@@ -1588,32 +1691,33 @@ STYLE_CSS = textwrap.dedent("""\
     .listen3-audio-block { text-align: center; margin: 1.25rem 0 1.5rem; padding: 1.25rem; background: #fff; border: 1px solid var(--lab-border); border-radius: var(--radius); }
     .listen3-big-play {
       font-size: 1.15rem; padding: 0.85rem 1.75rem; min-width: 8rem;
-      border-radius: 999px; border: 2px solid var(--lab-accent); background: var(--lab-bg);
-      color: var(--lab-accent); cursor: pointer; font-weight: 700;
+      border-radius: 999px; border: 2px solid var(--games-accent); background: var(--games-bg);
+      color: var(--games-accent); cursor: pointer; font-weight: 700;
     }
-    .listen3-big-play.playing { background: var(--lab-accent); color: #fff; }
+    .listen3-big-play.playing { background: var(--games-accent); color: #fff; }
     .listen3-big-play.loading { opacity: 0.6; }
     .listen3-replay-hint { margin-top: 0.5rem; font-size: 0.85rem; }
     .listen3-choices { display: flex; flex-direction: column; gap: 0.65rem; margin: 0.75rem 0 1rem; }
     .listen3-choice {
       text-align: left; padding: 0.85rem 1rem; border-radius: var(--radius);
-      border: 1px solid var(--lab-border); background: var(--surface); cursor: pointer;
+      border: 1px solid var(--games-border); background: var(--surface); cursor: pointer;
       font-size: 1rem; line-height: 1.35; color: var(--text);
     }
-    .listen3-choice:hover:not(:disabled) { border-color: var(--lab-accent); background: var(--lab-bg); }
+    .listen3-choice:hover:not(:disabled) { border-color: var(--games-accent); background: var(--games-bg); }
     .listen3-choice:disabled { cursor: default; }
-    .listen3-choice.is-correct { border-color: var(--accent); background: var(--accent-light); }
+    .listen3-choice.is-correct { border-color: var(--accent); background: #efe8f7; }
     .listen3-choice.is-wrong { border-color: #b54a4a; background: #fceeed; }
-    .listen3-feedback { margin: 1rem 0; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1px solid var(--lab-border); background: #fff; }
-    .listen3-feedback.ok { border-left: 4px solid var(--accent); }
+    .listen3-feedback { margin: 1rem 0; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1px solid var(--games-border); background: #fff; }
+    .listen3-feedback.ok { border-left: 4px solid var(--games-accent); }
     .listen3-feedback.bad { border-left: 4px solid #b54a4a; }
     .listen3-fb-title { font-weight: 700; margin: 0 0 0.35rem; }
-    .listen3-fb-hw { font-family: var(--font-word); font-size: 1.25rem; font-weight: 600; color: var(--lab-accent); margin: 0.25rem 0; }
+    .listen3-fb-hw { font-family: var(--font-word); font-size: 1.25rem; font-weight: 600; color: var(--games-accent); margin: 0.25rem 0; }
     .listen3-fb-en { margin: 0.35rem 0; }
     .listen3-fb-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.65rem; }
     .listen3-next { width: 100%; margin-top: 0.5rem; }
     .listen3-done-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem; }
-    .listen3-summary-score { font-size: 1.35rem; font-weight: 700; color: var(--lab-accent); }
+    .listen3-summary-score { font-size: 1.35rem; font-weight: 700; color: var(--games-accent); }
+    .listen3-audio-block { border-color: var(--games-border); }
     .lab-hint { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
     .lab-mode { font-size: 0.88rem; margin: -0.5rem 0 0.75rem; font-style: italic; }
     .lab-subhead { color: var(--lab-accent); font-size: 0.95rem; margin: 1.5rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1659,6 +1763,10 @@ STYLE_CSS = textwrap.dedent("""\
       text-decoration: none;
     }
     .theme-chip:hover { border-color: var(--lab-accent); background: #faf0d8; }
+    .theme-chip-games {
+      background: var(--games-bg); border-color: var(--games-border); color: var(--games-accent);
+    }
+    .theme-chip-games:hover { border-color: var(--games-accent); background: #ebe0f7; }
     .related-meaning .badge-lab { font-size: 0.7rem; vertical-align: middle; }
     .tag-chips { margin: 0.35rem 0 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
     .tag-chip {
@@ -1849,7 +1957,8 @@ def main() -> int:
     entry_dir = SITE_DIR / "entry"
     letter_dir = SITE_DIR / "letter"
     lab_dir = SITE_DIR / "lab"
-    for d in (assets, entry_dir, letter_dir, lab_dir):
+    games_dir = SITE_DIR / "games"
+    for d in (assets, entry_dir, letter_dir, lab_dir, games_dir):
         d.mkdir(parents=True, exist_ok=True)
     ensure_lunr(assets)
     ensure_audio_link()
@@ -1907,7 +2016,21 @@ def main() -> int:
     (SITE_DIR / "browse.html").write_text(build_browse_page(by_letter), encoding="utf-8")
     (SITE_DIR / "about.html").write_text(build_about_page(meta), encoding="utf-8")
     (lab_dir / "index.html").write_text(build_lab_page(), encoding="utf-8")
-    (lab_dir / "listen3.html").write_text(build_listen3_page(), encoding="utf-8")
+    (games_dir / "index.html").write_text(build_games_hub(), encoding="utf-8")
+    (games_dir / "listen3.html").write_text(build_listen3_page(), encoding="utf-8")
+    # Old Lab URL → Games (bookmarks)
+    (lab_dir / "listen3.html").write_text(
+        """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta http-equiv="refresh" content="0;url=../games/listen3.html">
+<title>Redirecting…</title>
+<link rel="canonical" href="../games/listen3.html">
+</head><body>
+<p>Listen-3 moved to <a href="../games/listen3.html">Games → Listen-3</a>.</p>
+</body></html>
+""",
+        encoding="utf-8",
+    )
     (assets / "style.css").write_text(STYLE_CSS, encoding="utf-8")
     (assets / "search.js").write_text(SEARCH_JS, encoding="utf-8")
     (assets / "audio-player.js").write_text(AUDIO_PLAYER_JS, encoding="utf-8")
